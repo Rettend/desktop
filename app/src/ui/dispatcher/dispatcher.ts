@@ -2007,10 +2007,7 @@ export class Dispatcher {
     return this.appStore._setExternalEditor(editor)
   }
 
-  /**
-   * Sets the user's preference for an external program to open repositories in.
-   */
-  public setSecondaryExternalEditor(editor: string): Promise<void> {
+  public setSecondaryExternalEditor(editor: string | null): Promise<void> {
     return this.appStore._setSecondaryExternalEditor(editor)
   }
 

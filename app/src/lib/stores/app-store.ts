@@ -6035,9 +6035,13 @@ export class AppStore extends TypedBaseStore<IAppState> {
     return promise
   }
 
-  public _setSecondaryExternalEditor(selectedEditor: string) {
+  public _setSecondaryExternalEditor(selectedEditor: string | null) {
     const promise = this.updateSelectedSecondaryExternalEditor(selectedEditor)
-    localStorage.setItem(secondaryExternalEditorKey, selectedEditor)
+    if (selectedEditor) {
+      localStorage.setItem(secondaryExternalEditorKey, selectedEditor)
+    } else {
+      localStorage.removeItem(secondaryExternalEditorKey)
+    }
     this.emitUpdate()
 
     this.updateMenuLabelsForSelectedRepository()

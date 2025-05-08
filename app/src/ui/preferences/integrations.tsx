@@ -24,7 +24,7 @@ interface IIntegrationsPreferencesProps {
   readonly useCustomShell: boolean
   readonly customShell: ICustomIntegration
   readonly onSelectedEditorChanged: (editor: string) => void
-  readonly onSelectedSecondaryEditorChanged: (editor: string) => void
+  readonly onSelectedSecondaryEditorChanged: (editor: string | null) => void
   readonly onSelectedShellChanged: (shell: Shell) => void
   readonly onUseCustomEditorChanged: (useCustomEditor: boolean) => void
   readonly onCustomEditorChanged: (customEditor: ICustomIntegration) => void
@@ -217,9 +217,17 @@ export class Integrations extends React.Component<
   }
 
   private setSelectedSecondaryEditor = (editor: string) => {
+    console.log('EDITOR - setSelectedSecondaryEditor', editor)
     if (editor === CustomIntegrationValue) {
       this.setState({ useCustomSecondaryEditor: true })
       this.props.onUseCustomSecondaryEditorChanged(true)
+    } else if (editor === '') {
+      this.setState({
+        useCustomSecondaryEditor: false,
+        selectedSecondaryExternalEditor: null,
+      })
+      this.props.onUseCustomSecondaryEditorChanged(false)
+      this.props.onSelectedSecondaryEditorChanged(null)
     } else {
       this.setState({
         useCustomSecondaryEditor: false,
@@ -539,7 +547,8 @@ export class Integrations extends React.Component<
             </h2>
           </legend>
           <Row>{this.renderSecondaryExternalEditor()}</Row>
-          {this.state.useCustomSecondaryEditor && this.renderCustomSecondaryExternalEditor()}
+          {this.state.useCustomSecondaryEditor &&
+            this.renderCustomSecondaryExternalEditor()}
         </fieldset>
         <fieldset>
           <legend>

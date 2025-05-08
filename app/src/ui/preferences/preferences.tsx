@@ -190,7 +190,8 @@ export class Preferences extends React.Component<
       askForConfirmationOnCommitFilteredChanges: false,
       uncommittedChangesStrategy: defaultUncommittedChangesStrategy,
       selectedExternalEditor: this.props.selectedExternalEditor,
-      selectedSecondaryExternalEditor: this.props.selectedSecondaryExternalEditor,
+      selectedSecondaryExternalEditor:
+        this.props.selectedSecondaryExternalEditor,
       availableShells: [],
       selectedShell: this.props.selectedShell,
       repositoryIndicatorsEnabled: this.props.repositoryIndicatorsEnabled,
@@ -269,7 +270,8 @@ export class Preferences extends React.Component<
       useCustomShell: this.props.useCustomShell,
       customShell: this.props.customShell ?? DefaultCustomIntegration,
       selectedExternalEditor: this.props.selectedExternalEditor,
-      selectedSecondaryExternalEditor: this.props.selectedSecondaryExternalEditor,
+      selectedSecondaryExternalEditor:
+        this.props.selectedSecondaryExternalEditor,
       selectedShell: this.props.selectedShell,
       isLoadingGitConfig: false,
     })
@@ -418,7 +420,9 @@ export class Preferences extends React.Component<
           <Integrations
             availableEditors={this.state.availableEditors}
             selectedExternalEditor={this.state.selectedExternalEditor}
-            selectedSecondaryExternalEditor={this.state.selectedSecondaryExternalEditor}
+            selectedSecondaryExternalEditor={
+              this.state.selectedSecondaryExternalEditor
+            }
             onSelectedEditorChanged={this.onSelectedEditorChanged}
             onSelectedSecondaryEditorChanged={
               this.onSelectedSecondaryEditorChanged
@@ -673,7 +677,8 @@ export class Preferences extends React.Component<
     this.setState({ selectedExternalEditor: editor })
   }
 
-  private onSelectedSecondaryEditorChanged = (editor: string) => {
+  private onSelectedSecondaryEditorChanged = (editor: string | null) => {
+    console.log('EDITOR - onSelectedSecondaryEditorChanged', editor)
     this.setState({ selectedSecondaryExternalEditor: editor })
   }
 
@@ -856,9 +861,9 @@ export class Preferences extends React.Component<
     if (this.state.selectedExternalEditor) {
       await dispatcher.setExternalEditor(this.state.selectedExternalEditor)
     }
-    if (this.state.selectedSecondaryExternalEditor) {
-      await dispatcher.setSecondaryExternalEditor(this.state.selectedSecondaryExternalEditor)
-    }
+    await dispatcher.setSecondaryExternalEditor(
+      this.state.selectedSecondaryExternalEditor
+    )
     await dispatcher.setShell(this.state.selectedShell)
     await dispatcher.setConfirmDiscardChangesSetting(
       this.state.confirmDiscardChanges
