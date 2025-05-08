@@ -1570,6 +1570,7 @@ export class App extends React.Component<IAppProps, IAppState> {
             }
             uncommittedChangesStrategy={this.state.uncommittedChangesStrategy}
             selectedExternalEditor={this.state.selectedExternalEditor}
+            selectedSecondaryExternalEditor={this.state.selectedSecondaryExternalEditor}
             useWindowsOpenSSH={this.state.useWindowsOpenSSH}
             showCommitLengthWarning={this.state.showCommitLengthWarning}
             notificationsEnabled={this.state.notificationsEnabled}

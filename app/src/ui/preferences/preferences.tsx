@@ -438,8 +438,8 @@ export class Preferences extends React.Component<
             onSelectedShellChanged={this.onSelectedShellChanged}
             onUseCustomEditorChanged={this.onUseCustomEditorChanged}
             onCustomEditorChanged={this.onCustomEditorChanged}
-            onCustomUseSecondaryEditorChanged={
-              this.onCustomUseSecondaryEditorChanged
+            onUseCustomSecondaryEditorChanged={
+              this.onUseCustomSecondaryEditorChanged
             }
             onCustomSecondaryEditorChanged={this.onCustomSecondaryEditorChanged}
             onUseCustomShellChanged={this.onUseCustomShellChanged}
@@ -888,7 +888,7 @@ export class Preferences extends React.Component<
     this.setState({ selectedIndex: index })
   }
 
-  private onCustomUseSecondaryEditorChanged = (
+  private onUseCustomSecondaryEditorChanged = (
     useCustomSecondaryEditor: boolean
   ) => {
     this.setState({ useCustomSecondaryEditor })

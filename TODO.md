@@ -20,7 +20,7 @@ Some initial work has been done, primarily in `app-store.ts`, `app-state.ts`, an
 2. **Settings UI (`app/src/ui/preferences/preferences.tsx` and `app/src/ui/preferences/integrations.tsx`):**
     - **`app/src/ui/preferences/preferences.tsx` (DONE):**
         - **Status:** `IPreferencesProps` and `IPreferencesState` updated. State initialized. Props/handlers passed down to `<Integrations />`. `onSave` updated to call dispatcher actions.
-    - **`app/src/ui/preferences/integrations.tsx` (NEXT):**
+    - **`app/src/ui/preferences/integrations.tsx` (DONE):**
         - Add new props to `IIntegrationsPreferencesProps` (incl. `selectedSecondaryExternalEditor`, `useCustomSecondaryEditor`, `customSecondaryEditor`, and handlers).
         - Add corresponding state fields to `IIntegrationsPreferencesState`.
         - Update constructor/`componentWillReceiveProps` to handle new props/state.
@@ -46,13 +46,14 @@ Some initial work has been done, primarily in `app-store.ts`, `app-state.ts`, an
 
 - `app/src/lib/stores/app-store.ts`: (Functionally complete for now)
 - `app/src/ui/preferences/preferences.tsx`: (DONE)
-- `app/src/ui/preferences/integrations.tsx`: (NEXT - UI Implementation)
+- `app/src/ui/preferences/integrations.tsx`: (DONE - UI Implementation)
 - `app/src/ui/changes/no-changes.tsx` (or other main UI view): (PENDING - Button/Action)
 - `app/src/main-process/menu/build-default-menu.ts`: (PENDING - Menu Item/Shortcut)
 - `app/src/ui/dispatcher/dispatcher.ts`: (User reports done - Actions)
 - `app/src/lib/app-state.ts`: (DONE)
 - `app/src/models/menu-labels.ts`: (DONE)
 - `app/src/models/preferences.ts`: (No changes needed currently)
+- `app/src/ui/app.tsx`: (PENDING - needs investigation for secondary editor integration)
 
 **General Tips:**
 

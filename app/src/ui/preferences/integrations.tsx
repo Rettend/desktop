@@ -14,25 +14,38 @@ const CustomIntegrationValue = 'other'
 interface IIntegrationsPreferencesProps {
   readonly availableEditors: ReadonlyArray<string>
   readonly selectedExternalEditor: string | null
+  readonly selectedSecondaryExternalEditor: string | null
   readonly availableShells: ReadonlyArray<Shell>
   readonly selectedShell: Shell
   readonly useCustomEditor: boolean
   readonly customEditor: ICustomIntegration
+  readonly useCustomSecondaryEditor: boolean
+  readonly customSecondaryEditor: ICustomIntegration | null
   readonly useCustomShell: boolean
   readonly customShell: ICustomIntegration
   readonly onSelectedEditorChanged: (editor: string) => void
+  readonly onSelectedSecondaryEditorChanged: (editor: string) => void
   readonly onSelectedShellChanged: (shell: Shell) => void
   readonly onUseCustomEditorChanged: (useCustomEditor: boolean) => void
   readonly onCustomEditorChanged: (customEditor: ICustomIntegration) => void
+  readonly onUseCustomSecondaryEditorChanged: (
+    useCustomSecondaryEditor: boolean
+  ) => void
+  readonly onCustomSecondaryEditorChanged: (
+    customSecondaryEditor: ICustomIntegration
+  ) => void
   readonly onUseCustomShellChanged: (useCustomShell: boolean) => void
   readonly onCustomShellChanged: (customShell: ICustomIntegration) => void
 }
 
 interface IIntegrationsPreferencesState {
   readonly selectedExternalEditor: string | null
+  readonly selectedSecondaryExternalEditor: string | null
   readonly selectedShell: Shell
   readonly useCustomEditor: boolean
   readonly customEditor: ICustomIntegration
+  readonly useCustomSecondaryEditor: boolean
+  readonly customSecondaryEditor: ICustomIntegration
   readonly useCustomShell: boolean
   readonly customShell: ICustomIntegration
 }
@@ -42,6 +55,8 @@ export class Integrations extends React.Component<
   IIntegrationsPreferencesState
 > {
   private customEditorFormRef = React.createRef<CustomIntegrationForm>()
+  private customSecondaryEditorFormRef =
+    React.createRef<CustomIntegrationForm>()
   private customShellFormRef = React.createRef<CustomIntegrationForm>()
 
   public constructor(props: IIntegrationsPreferencesProps) {
@@ -49,9 +64,16 @@ export class Integrations extends React.Component<
 
     this.state = {
       selectedExternalEditor: this.props.selectedExternalEditor,
+      selectedSecondaryExternalEditor:
+        this.props.selectedSecondaryExternalEditor,
       selectedShell: this.props.selectedShell,
       useCustomEditor: this.props.useCustomEditor,
       customEditor: this.props.customEditor,
+      useCustomSecondaryEditor: this.props.useCustomSecondaryEditor,
+      customSecondaryEditor: this.props.customSecondaryEditor ?? {
+        path: '',
+        arguments: '',
+      },
       useCustomShell: this.props.useCustomShell,
       customShell: this.props.customShell,
     }
@@ -72,6 +94,22 @@ export class Integrations extends React.Component<
       }
     }
 
+    let selectedSecondaryExternalEditor =
+      nextProps.selectedSecondaryExternalEditor
+    if (editors.length) {
+      const indexOf = selectedSecondaryExternalEditor
+        ? editors.indexOf(selectedSecondaryExternalEditor)
+        : -1
+      if (indexOf === -1 && selectedSecondaryExternalEditor !== null) {
+        // Only default if it's not explicitly set to null (meaning no editor selected)
+        // And there are available editors to choose from
+        selectedSecondaryExternalEditor = editors[0]
+        nextProps.onSelectedSecondaryEditorChanged(
+          selectedSecondaryExternalEditor
+        )
+      }
+    }
+
     const shells = nextProps.availableShells
     let selectedShell = nextProps.selectedShell
     if (shells.length) {
@@ -83,11 +121,17 @@ export class Integrations extends React.Component<
     }
     this.setState({
       selectedExternalEditor,
+      selectedSecondaryExternalEditor,
       selectedShell,
       useCustomEditor: nextProps.useCustomEditor,
+      customEditor: nextProps.customEditor,
+      useCustomSecondaryEditor: nextProps.useCustomSecondaryEditor,
+      customSecondaryEditor: nextProps.customSecondaryEditor ?? {
+        path: '',
+        arguments: '',
+      },
       useCustomShell: nextProps.useCustomShell,
       customShell: nextProps.customShell,
-      customEditor: nextProps.customEditor,
     })
   }
 
@@ -125,6 +169,13 @@ export class Integrations extends React.Component<
       this.customEditorFormRef.current?.focus()
     }
 
+    if (
+      !prevState.useCustomSecondaryEditor &&
+      this.state.useCustomSecondaryEditor
+    ) {
+      this.customSecondaryEditorFormRef.current?.focus()
+    }
+
     if (!prevState.useCustomShell && this.state.useCustomShell) {
       this.customShellFormRef.current?.focus()
     }
@@ -152,6 +203,30 @@ export class Integrations extends React.Component<
       })
       this.props.onUseCustomEditorChanged(false)
       this.props.onSelectedEditorChanged(editor)
+    }
+  }
+
+  private onSelectedSecondaryEditorChanged = (
+    event: React.FormEvent<HTMLSelectElement>
+  ) => {
+    const value = event.currentTarget.value
+    if (!value) {
+      return
+    }
+    this.setSelectedSecondaryEditor(value)
+  }
+
+  private setSelectedSecondaryEditor = (editor: string) => {
+    if (editor === CustomIntegrationValue) {
+      this.setState({ useCustomSecondaryEditor: true })
+      this.props.onUseCustomSecondaryEditorChanged(true)
+    } else {
+      this.setState({
+        useCustomSecondaryEditor: false,
+        selectedSecondaryExternalEditor: editor,
+      })
+      this.props.onUseCustomSecondaryEditorChanged(false)
+      this.props.onSelectedSecondaryEditorChanged(editor)
     }
   }
 
@@ -232,6 +307,48 @@ export class Integrations extends React.Component<
     )
   }
 
+  private renderSecondaryExternalEditor() {
+    const options = this.props.availableEditors
+    const { selectedSecondaryExternalEditor, useCustomSecondaryEditor } =
+      this.state
+    const label = __DARWIN__
+      ? 'Secondary External Editor'
+      : 'Secondary external editor'
+
+    // Unlike the primary editor, we don't show a "No editors found" message here,
+    // as it's an optional feature. The Select component will be empty or show available.
+
+    return (
+      <Select
+        label={enableCustomIntegration() ? undefined : label}
+        aria-label="Secondary external editor"
+        value={
+          useCustomSecondaryEditor
+            ? CustomIntegrationValue
+            : selectedSecondaryExternalEditor ?? undefined
+        }
+        onChange={this.onSelectedSecondaryEditorChanged}
+      >
+        {/* Allow a "None" option */}
+        <option key="none" value="">
+          None
+        </option>
+        {options.map(n => (
+          <option key={n} value={n}>
+            {n}
+          </option>
+        ))}
+        {enableCustomIntegration() && (
+          <option key={CustomIntegrationValue} value={CustomIntegrationValue}>
+            {__DARWIN__
+              ? 'Configure Custom Secondary Editor…'
+              : 'Configure custom secondary editor…'}
+          </option>
+        )}
+      </Select>
+    )
+  }
+
   private renderNoExternalEditorHint() {
     const options = this.props.availableEditors
     if (options.length > 0) {
@@ -267,6 +384,21 @@ export class Integrations extends React.Component<
     )
   }
 
+  private renderCustomSecondaryExternalEditor() {
+    return (
+      <Row>
+        <CustomIntegrationForm
+          id="custom-secondary-editor"
+          ref={this.customSecondaryEditorFormRef}
+          path={this.state.customSecondaryEditor.path ?? ''}
+          arguments={this.state.customSecondaryEditor.arguments}
+          onPathChanged={this.onCustomSecondaryEditorPathChanged}
+          onArgumentsChanged={this.onCustomSecondaryEditorArgumentsChanged}
+        />
+      </Row>
+    )
+  }
+
   private onCustomEditorPathChanged = (path: string, bundleID?: string) => {
     const customEditor: ICustomIntegration = {
       path,
@@ -287,6 +419,31 @@ export class Integrations extends React.Component<
 
     this.setState({ customEditor })
     this.props.onCustomEditorChanged(customEditor)
+  }
+
+  private onCustomSecondaryEditorPathChanged = (
+    path: string,
+    bundleID?: string
+  ) => {
+    const customSecondaryEditor: ICustomIntegration = {
+      path,
+      bundleID,
+      arguments: this.state.customSecondaryEditor.arguments ?? [],
+    }
+
+    this.setState({ customSecondaryEditor })
+    this.props.onCustomSecondaryEditorChanged(customSecondaryEditor)
+  }
+
+  private onCustomSecondaryEditorArgumentsChanged = (args: string) => {
+    const customSecondaryEditor: ICustomIntegration = {
+      path: this.state.customSecondaryEditor.path,
+      bundleID: this.state.customSecondaryEditor.bundleID,
+      arguments: args,
+    }
+
+    this.setState({ customSecondaryEditor })
+    this.props.onCustomSecondaryEditorChanged(customSecondaryEditor)
   }
 
   private renderSelectedShell() {
@@ -357,6 +514,7 @@ export class Integrations extends React.Component<
         <DialogContent>
           <h2>Applications</h2>
           <Row>{this.renderExternalEditor()}</Row>
+          <Row>{this.renderSecondaryExternalEditor()}</Row>
           <Row>{this.renderSelectedShell()}</Row>
         </DialogContent>
       )
@@ -371,6 +529,18 @@ export class Integrations extends React.Component<
           <Row>{this.renderExternalEditor()}</Row>
           {this.state.useCustomEditor && this.renderCustomExternalEditor()}
           {this.renderNoExternalEditorHint()}
+        </fieldset>
+        <fieldset>
+          <legend>
+            <h2>
+              {__DARWIN__
+                ? 'Secondary External Editor'
+                : 'Secondary external editor'}
+            </h2>
+          </legend>
+          <Row>{this.renderSecondaryExternalEditor()}</Row>
+          {this.state.useCustomSecondaryEditor &&
+            this.renderCustomSecondaryExternalEditor()}
         </fieldset>
         <fieldset>
           <legend>

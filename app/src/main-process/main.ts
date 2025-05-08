@@ -353,6 +353,7 @@ app.on('ready', () => {
     buildDefaultMenu({
       selectedShell: null,
       selectedExternalEditor: null,
+      selectedSecondaryExternalEditor: null,
       askForConfirmationOnRepositoryRemoval: false,
       askForConfirmationOnForcePush: false,
     })
