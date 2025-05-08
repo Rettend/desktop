@@ -1473,6 +1473,13 @@ export class Dispatcher {
   }
 
   /**
+   * Opens a path in the secondary external editor selected by the user.
+   */
+  public async openInSecondaryExternalEditor(fullPath: string): Promise<void> {
+    return this.appStore._openInSecondaryExternalEditor(fullPath)
+  }
+
+  /**
    * Persist the given content to the repository's root .gitignore.
    *
    * If the repository root doesn't contain a .gitignore file one

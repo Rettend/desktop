@@ -40,10 +40,10 @@ Some initial work has been done, primarily in `app-store.ts`, `app-state.ts`, an
         - Added `onOpenInSecondaryExternalEditorClicked` handler to increment a metric (metric name `'suggestedStepOpenInSecondaryExternalEditor'` needs to be defined).
         - The button relies on a menu item ID `'open-secondary-external-editor'` which will trigger the actual editor opening logic via `app.tsx`.
     - **Alternative: Toolbar button:** Add button, connect to dispatcher.
-    - **Dispatcher (`app/src/ui/dispatcher/dispatcher.ts`) (PENDING - Needs `openRepositoryInSecondaryEditor` and metric definition):**
-        - Add `openRepositoryInSecondaryEditor(repository: Repository)` action (should call `appStore._openInSecondaryExternalEditor`). This is referenced by the menu event handler in `app.tsx`.
+    - **Dispatcher (`app/src/ui/dispatcher/dispatcher.ts`) (DONE):**
+        - Add `openInSecondaryExternalEditor(fullPath: string)` action (should call `appStore._openInSecondaryExternalEditor`). This is referenced by the menu event handler in `app.tsx`.
         - Define the metric name `'suggestedStepOpenInSecondaryExternalEditor'`.
-        - Ensure actions exist for saving secondary editor preferences (`setSecondaryExternalEditor`, `setUseCustomSecondaryEditor`, `setCustomSecondaryEditor`) (User reported done, verify).
+        - Ensure actions exist for saving secondary editor preferences (`setSecondaryExternalEditor`, `setUseCustomSecondaryEditor`, `setCustomSecondaryEditor`) (User reported done).
 
 5. **Keybinding (`app/src/main-process/menu/build-default-menu.ts`) (PENDING):**
     - **`MenuLabelsEvent`**: Includes `selectedSecondaryExternalEditor`.
@@ -55,7 +55,7 @@ Some initial work has been done, primarily in `app-store.ts`, `app-state.ts`, an
 - `app/src/lib/stores/app-store.ts`: (Functionally complete for now)
 - `app/src/ui/preferences/preferences.tsx`: (DONE)
 - `app/src/ui/preferences/integrations.tsx`: (DONE - UI Implementation)
-- `app/src/ui/changes/no-changes.tsx` (or other main UI view): (PENDING - Button/Action)
+- `app/src/ui/changes/no-changes.tsx` (or other main UI view): (DONE - Button/Action)
 - `app/src/main-process/menu/build-default-menu.ts`: (PENDING - Menu Item/Shortcut)
 - `app/src/ui/dispatcher/dispatcher.ts`: (User reports done - Actions)
 - `app/src/lib/app-state.ts`: (DONE)
