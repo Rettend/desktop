@@ -52,23 +52,24 @@ Some initial work has been done, primarily in `app-store.ts`, `app-state.ts`, an
         - Define the metric name `'suggestedStepOpenInSecondaryExternalEditor'`.
         - Ensure actions exist for saving secondary editor preferences (`setSecondaryExternalEditor`, `setUseCustomSecondaryEditor`, `setCustomSecondaryEditor`) (User reported done).
 
-5. **Keybinding (`app/src/main-process/menu/build-default-menu.ts`) (DONE):**
+5. **Keybinding (`app/src/main-process/menu/build-default-menu.ts`) (DONE for menu item, IPC Handler PENDING):**
     - **`MenuLabelsEvent`**: Includes `selectedSecondaryExternalEditor` (DONE).
     - **`buildDefaultMenu` function:** Signature destructures `selectedSecondaryExternalEditor`. Menu item "Open in Secondary External Editor" added with label, accelerator `CmdOrCtrl+Alt+A`, enabled state, and click handler using `emit('open-secondary-external-editor')` (DONE).
-    - **IPC Handling:** Define menu event. Update `AppStore` listener to call `_openInSecondaryExternalEditor`. (PENDING)
+    - **IPC Handling:** (PENDING) Add case for `'open-secondary-external-editor'` in `onMenuEvent` within `app/src/ui/app.tsx` to call `this.openCurrentRepositoryInSecondaryExternalEditor()`.
 
 **Key Files Revisited (with focus areas for secondary editor):**
 
 - `app/src/lib/stores/app-store.ts`: (Functionally complete for now)
+  - **Consider:** Ensure `selectedSecondaryExternalEditor` (name/label in `IAppState`) is appropriately set (e.g., to "Custom Editor") when a custom secondary editor path is configured, to ensure UI elements depending on this name enable correctly.
 - `app/src/ui/preferences/preferences.tsx`: (DONE)
 - `app/src/ui/preferences/integrations.tsx`: (DONE - UI Implementation)
-- `app/src/ui/changes/no-changes.tsx` (or other main UI view): (DONE - Button/Action)
+- `app/src/ui/changes/no-changes.tsx` (or other main UI view): (DONE - Button/Action, Dispatcher/Metric seems to be addressed)
 - `app/src/main-process/menu/build-default-menu.ts`: (DONE - Menu Item/Shortcut)
 - `app/src/ui/dispatcher/dispatcher.ts`: (User reports done - Actions)
 - `app/src/lib/app-state.ts`: (DONE)
 - `app/src/models/menu-labels.ts`: (DONE)
 - `app/src/models/preferences.ts`: (No changes needed currently)
-- `app/src/ui/app.tsx`: (PENDING - needs investigation for secondary editor integration)
+- `app/src/ui/app.tsx`: (IN PROGRESS - IPC handler for menu event needs to be added as described above. Review prop passing and state logic for editor availability and name.)
 
 **General Tips:**
 

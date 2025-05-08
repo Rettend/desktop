@@ -1435,7 +1435,7 @@ export class App extends React.Component<IAppProps, IAppState> {
   ) => {
     showCertificateTrustDialog(
       certificate,
-      'Could not securely connect to the server, because its certificate is not trusted. Attackers might be trying to steal your information.\n\nTo connect unsafely, which may put your data at risk, you can “Always trust” the certificate and try again.'
+      'Could not securely connect to the server, because its certificate is not trusted. Attackers might be trying to steal your information.\n\nTo connect unsafely, which may put your data at risk, you can "Always trust" the certificate and try again.'
     )
   }
 
@@ -1581,7 +1581,9 @@ export class App extends React.Component<IAppProps, IAppState> {
             }
             uncommittedChangesStrategy={this.state.uncommittedChangesStrategy}
             selectedExternalEditor={this.state.selectedExternalEditor}
-            selectedSecondaryExternalEditor={this.state.selectedSecondaryExternalEditor}
+            selectedSecondaryExternalEditor={
+              this.state.selectedSecondaryExternalEditor
+            }
             useWindowsOpenSSH={this.state.useWindowsOpenSSH}
             showCommitLengthWarning={this.state.showCommitLengthWarning}
             notificationsEnabled={this.state.notificationsEnabled}
@@ -1593,7 +1595,9 @@ export class App extends React.Component<IAppProps, IAppState> {
             selectedTheme={this.state.selectedTheme}
             selectedTabSize={this.state.selectedTabSize}
             useCustomEditor={this.state.useCustomEditor}
+            useCustomSecondaryEditor={this.state.useCustomSecondaryEditor}
             customEditor={this.state.customEditor}
+            customSecondaryEditor={this.state.customSecondaryEditor}
             useCustomShell={this.state.useCustomShell}
             customShell={this.state.customShell}
             repositoryIndicatorsEnabled={this.state.repositoryIndicatorsEnabled}
@@ -2829,6 +2833,10 @@ export class App extends React.Component<IAppProps, IAppState> {
     const externalEditorLabel = this.state.selectedExternalEditor
       ? this.state.selectedExternalEditor
       : undefined
+    const secondaryExternalEditorLabel = this.state
+      .selectedSecondaryExternalEditor
+      ? this.state.selectedSecondaryExternalEditor
+      : undefined
     const { useCustomShell, selectedShell } = this.state
     const filterText = this.state.repositoryFilterText
     return (
@@ -2848,7 +2856,9 @@ export class App extends React.Component<IAppProps, IAppState> {
         onOpenInShell={this.openInShell}
         onShowRepository={this.showRepository}
         onOpenInExternalEditor={this.openInExternalEditor}
+        onOpenInSecondaryExternalEditor={this.openInSecondaryExternalEditor}
         externalEditorLabel={externalEditorLabel}
+        secondaryExternalEditorLabel={secondaryExternalEditorLabel}
         shellLabel={useCustomShell ? undefined : selectedShell}
         dispatcher={this.props.dispatcher}
       />
@@ -3019,7 +3029,8 @@ export class App extends React.Component<IAppProps, IAppState> {
     }
 
     const externalEditorLabel = this.state.selectedExternalEditor ?? undefined
-    const secondaryExternalEditorLabel = this.state.selectedSecondaryExternalEditor ?? undefined
+    const secondaryExternalEditorLabel =
+      this.state.selectedSecondaryExternalEditor ?? undefined
 
     const onChangeRepositoryAlias = (repository: Repository) => {
       this.props.dispatcher.showPopup({
@@ -3408,7 +3419,8 @@ export class App extends React.Component<IAppProps, IAppState> {
             state.useCustomEditor || state.selectedExternalEditor !== null
           }
           isSecondaryExternalEditorAvailable={
-            state.useCustomEditor || state.selectedSecondaryExternalEditor !== null
+            state.useCustomEditor ||
+            state.selectedSecondaryExternalEditor !== null
           }
           externalEditorLabel={externalEditorLabel}
           secondaryExternalEditorLabel={secondaryExternalEditorLabel}

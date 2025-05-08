@@ -61,8 +61,14 @@ interface IRepositoriesListProps {
   /** Called when the repository should be opened in an external editor */
   readonly onOpenInExternalEditor: (repository: Repositoryish) => void
 
+  /** Called when the repository should be opened in a secondary external editor */
+  readonly onOpenInSecondaryExternalEditor: (repository: Repositoryish) => void
+
   /** The current external editor selected by the user */
   readonly externalEditorLabel?: string
+
+  /** The current secondary external editor selected by the user */
+  readonly secondaryExternalEditorLabel?: string
 
   /** The label for the user's preferred shell. */
   readonly shellLabel?: string
@@ -216,9 +222,11 @@ export class RepositoriesList extends React.Component<
       onShowRepository: this.props.onShowRepository,
       onOpenInShell: this.props.onOpenInShell,
       onOpenInExternalEditor: this.props.onOpenInExternalEditor,
+      onOpenInSecondaryExternalEditor: this.props.onOpenInSecondaryExternalEditor,
       askForConfirmationOnRemoveRepository:
         this.props.askForConfirmationOnRemoveRepository,
       externalEditorLabel: this.props.externalEditorLabel,
+      secondaryExternalEditorLabel: this.props.secondaryExternalEditorLabel,
       onChangeRepositoryAlias: this.onChangeRepositoryAlias,
       onRemoveRepositoryAlias: this.onRemoveRepositoryAlias,
       onViewOnGitHub: this.props.onViewOnGitHub,
