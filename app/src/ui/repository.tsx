@@ -94,8 +94,6 @@ interface IRepositoryViewProps {
   /** A cached entry representing an external editor found on the user's machine */
   readonly resolvedExternalEditor: string | null
 
-  /** The name of the currently selected secondary external editor */
-  readonly selectedSecondaryExternalEditorName: string | null
 
   /**
    * Callback to open a selected file using the configured external editor
@@ -546,7 +544,6 @@ export class RepositoryView extends React.Component<
             repositoryState={this.props.state}
             isExternalEditorAvailable={this.props.isExternalEditorAvailable}
             isSecondaryExternalEditorAvailable={this.props.isSecondaryExternalEditorAvailable}
-            selectedSecondaryExternalEditorName={this.props.selectedSecondaryExternalEditorName}
             dispatcher={this.props.dispatcher}
             pullRequestSuggestedNextAction={
               this.props.pullRequestSuggestedNextAction

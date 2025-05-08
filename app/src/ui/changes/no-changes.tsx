@@ -87,11 +87,6 @@ interface INoChangesProps {
    */
   readonly isSecondaryExternalEditorAvailable: boolean
 
-  /**
-   * The display name of the configured secondary external editor.
-   */
-  readonly selectedSecondaryExternalEditorName: string | null
-
   /** The user's preference of pull request suggested next action to use **/
   readonly pullRequestSuggestedNextAction?: PullRequestSuggestedNextAction
 }
@@ -366,9 +361,7 @@ export class NoChanges extends React.Component<
       log.error(`Could not find matching menu item for ${itemId}`)
     }
 
-    const editorName =
-      this.props.selectedSecondaryExternalEditorName || 'Secondary Editor'
-    const title = `Open the repository in ${editorName}`
+    const title = `Open the repository in your secondary editor`
 
     const description = (
       <>
@@ -392,7 +385,7 @@ export class NoChanges extends React.Component<
         buttonText={
           menuItem
             ? formatMenuItemLabel(menuItem.label)
-            : `Open in ${editorName}`
+            : `Open in secondary editor`
         }
         disabled={menuItem ? !menuItem.enabled : false}
         onClick={this.onOpenInSecondaryExternalEditorClicked}

@@ -3425,9 +3425,6 @@ export class App extends React.Component<IAppProps, IAppState> {
           externalEditorLabel={externalEditorLabel}
           secondaryExternalEditorLabel={secondaryExternalEditorLabel}
           resolvedExternalEditor={state.resolvedExternalEditor}
-          selectedSecondaryExternalEditorName={
-            state.selectedSecondaryExternalEditor
-          }
           onOpenInExternalEditor={this.onOpenInExternalEditor}
           onOpenInSecondaryExternalEditor={this.onOpenInSecondaryExternalEditor}
           appMenu={state.appMenuState[0]}
