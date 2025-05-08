@@ -1202,7 +1202,7 @@ export class Dispatcher {
     if (
       multiCommitOperationState == null ||
       multiCommitOperationState.operationDetail.kind !==
-        MultiCommitOperationKind.Rebase
+      MultiCommitOperationKind.Rebase
     ) {
       return
     }
@@ -1945,8 +1945,7 @@ export class Dispatcher {
       default:
         const unknownAction: IUnknownAction = action
         log.warn(
-          `Unknown URL action: ${
-            unknownAction.name
+          `Unknown URL action: ${unknownAction.name
           } - payload: ${JSON.stringify(unknownAction)}`
         )
     }
@@ -1999,6 +1998,13 @@ export class Dispatcher {
    */
   public setExternalEditor(editor: string): Promise<void> {
     return this.appStore._setExternalEditor(editor)
+  }
+
+  /**
+   * Sets the user's preference for an external program to open repositories in.
+   */
+  public setSecondaryExternalEditor(editor: string): Promise<void> {
+    return this.appStore._setSecondaryExternalEditor(editor)
   }
 
   /**
@@ -3052,7 +3058,7 @@ export class Dispatcher {
       !isCherryPickConflictState(conflictState) ||
       multiCommitOperationState == null ||
       multiCommitOperationState.operationDetail.kind !==
-        MultiCommitOperationKind.CherryPick
+      MultiCommitOperationKind.CherryPick
     ) {
       log.error(
         '[cherryPick] - conflict state was null or not in a cherry-pick conflict state - unable to continue'
@@ -3249,9 +3255,19 @@ export class Dispatcher {
     this.appStore._setUseCustomEditor(useCustomEditor)
   }
 
+  /** Set whether or not the user wants to use a custom secondary external editor */
+  public setUseCustomSecondaryEditor(useCustomSecondaryEditor: boolean) {
+    this.appStore._setUseCustomSecondaryEditor(useCustomSecondaryEditor)
+  }
+
   /** Set the custom external editor info */
   public setCustomEditor(customEditor: ICustomIntegration) {
     this.appStore._setCustomEditor(customEditor)
+  }
+
+  /** Set the custom secondary external editor info */
+  public setCustomSecondaryEditor(customSecondaryEditor: ICustomIntegration) {
+    this.appStore._setCustomSecondaryEditor(customSecondaryEditor)
   }
 
   /** Set whether or not the user wants to use a custom shell */
@@ -3776,7 +3792,7 @@ export class Dispatcher {
         if (
           multiCommitOperationState !== null &&
           multiCommitOperationState.operationDetail.kind ===
-            MultiCommitOperationKind.CherryPick
+          MultiCommitOperationKind.CherryPick
         ) {
           // TODO: expanded to other types - not functionally necessary; makes
           // progress dialog more accurate; likely only regular rebase has the

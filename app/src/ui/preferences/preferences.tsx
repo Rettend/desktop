@@ -69,11 +69,14 @@ interface IPreferencesProps {
   readonly askForConfirmationOnCommitFilteredChanges: boolean
   readonly uncommittedChangesStrategy: UncommittedChangesStrategy
   readonly selectedExternalEditor: string | null
+  readonly selectedSecondaryExternalEditor: string | null
   readonly selectedShell: Shell
   readonly selectedTheme: ApplicationTheme
   readonly selectedTabSize: number
   readonly useCustomEditor: boolean
   readonly customEditor: ICustomIntegration | null
+  readonly useCustomSecondaryEditor: boolean
+  readonly customSecondaryEditor: ICustomIntegration | null
   readonly useCustomShell: boolean
   readonly customShell: ICustomIntegration | null
   readonly repositoryIndicatorsEnabled: boolean
@@ -108,9 +111,12 @@ interface IPreferencesState {
   readonly availableEditors: ReadonlyArray<string>
   readonly useCustomEditor: boolean
   readonly customEditor: ICustomIntegration
+  readonly useCustomSecondaryEditor: boolean
+  readonly customSecondaryEditor: ICustomIntegration
   readonly useCustomShell: boolean
   readonly customShell: ICustomIntegration
   readonly selectedExternalEditor: string | null
+  readonly selectedSecondaryExternalEditor: string | null
   readonly availableShells: ReadonlyArray<Shell>
   readonly selectedShell: Shell
 
@@ -164,6 +170,9 @@ export class Preferences extends React.Component<
       availableEditors: [],
       useCustomEditor: this.props.useCustomEditor,
       customEditor: this.props.customEditor ?? DefaultCustomIntegration,
+      useCustomSecondaryEditor: this.props.useCustomSecondaryEditor,
+      customSecondaryEditor:
+        this.props.customSecondaryEditor ?? DefaultCustomIntegration,
       useCustomShell: this.props.useCustomShell,
       customShell: this.props.customShell ?? DefaultCustomIntegration,
       useWindowsOpenSSH: false,
@@ -181,6 +190,8 @@ export class Preferences extends React.Component<
       askForConfirmationOnCommitFilteredChanges: false,
       uncommittedChangesStrategy: defaultUncommittedChangesStrategy,
       selectedExternalEditor: this.props.selectedExternalEditor,
+      selectedSecondaryExternalEditor:
+        this.props.selectedSecondaryExternalEditor,
       availableShells: [],
       selectedShell: this.props.selectedShell,
       repositoryIndicatorsEnabled: this.props.repositoryIndicatorsEnabled,
@@ -253,8 +264,15 @@ export class Preferences extends React.Component<
       availableEditors,
       useCustomEditor: this.props.useCustomEditor,
       customEditor: this.props.customEditor ?? DefaultCustomIntegration,
+      useCustomSecondaryEditor: this.props.useCustomSecondaryEditor,
+      customSecondaryEditor:
+        this.props.customSecondaryEditor ?? DefaultCustomIntegration,
       useCustomShell: this.props.useCustomShell,
       customShell: this.props.customShell ?? DefaultCustomIntegration,
+      selectedExternalEditor: this.props.selectedExternalEditor,
+      selectedSecondaryExternalEditor:
+        this.props.selectedSecondaryExternalEditor,
+      selectedShell: this.props.selectedShell,
       isLoadingGitConfig: false,
     })
   }
@@ -402,16 +420,28 @@ export class Preferences extends React.Component<
           <Integrations
             availableEditors={this.state.availableEditors}
             selectedExternalEditor={this.state.selectedExternalEditor}
+            selectedSecondaryExternalEditor={
+              this.state.selectedSecondaryExternalEditor
+            }
             onSelectedEditorChanged={this.onSelectedEditorChanged}
+            onSelectedSecondaryEditorChanged={
+              this.onSelectedSecondaryEditorChanged
+            }
             availableShells={this.state.availableShells}
             selectedShell={this.state.selectedShell}
             useCustomEditor={this.state.useCustomEditor}
             customEditor={this.state.customEditor}
+            useCustomSecondaryEditor={this.state.useCustomSecondaryEditor}
+            customSecondaryEditor={this.state.customSecondaryEditor}
             useCustomShell={this.state.useCustomShell}
             customShell={this.state.customShell}
             onSelectedShellChanged={this.onSelectedShellChanged}
             onUseCustomEditorChanged={this.onUseCustomEditorChanged}
             onCustomEditorChanged={this.onCustomEditorChanged}
+            onCustomUseSecondaryEditorChanged={
+              this.onCustomUseSecondaryEditorChanged
+            }
+            onCustomSecondaryEditorChanged={this.onCustomSecondaryEditorChanged}
             onUseCustomShellChanged={this.onUseCustomShellChanged}
             onCustomShellChanged={this.onCustomShellChanged}
           />
@@ -647,6 +677,10 @@ export class Preferences extends React.Component<
     this.setState({ selectedExternalEditor: editor })
   }
 
+  private onSelectedSecondaryEditorChanged = (editor: string) => {
+    this.setState({ selectedSecondaryExternalEditor: editor })
+  }
+
   private onSelectedShellChanged = (shell: Shell) => {
     this.setState({ selectedShell: shell })
   }
@@ -762,14 +796,30 @@ export class Preferences extends React.Component<
 
     await dispatcher.setStatsOptOut(this.state.optOutOfUsageTracking, false)
 
-    const { useCustomEditor, customEditor, useCustomShell, customShell } =
-      this.state
+    const {
+      useCustomEditor,
+      customEditor,
+      useCustomSecondaryEditor,
+      customSecondaryEditor,
+      useCustomShell,
+      customShell,
+    } = this.state
 
     const isValidCustomEditor =
       customEditor && (await isValidCustomIntegration(customEditor))
     dispatcher.setUseCustomEditor(useCustomEditor && isValidCustomEditor)
     if (isValidCustomEditor) {
       dispatcher.setCustomEditor(customEditor)
+    }
+
+    const isValidCustomSecondaryEditor =
+      customSecondaryEditor &&
+      (await isValidCustomIntegration(customSecondaryEditor))
+    dispatcher.setUseCustomSecondaryEditor(
+      useCustomSecondaryEditor && isValidCustomSecondaryEditor
+    )
+    if (isValidCustomSecondaryEditor) {
+      dispatcher.setCustomSecondaryEditor(customSecondaryEditor)
     }
 
     const isValidCustomShell =
@@ -810,6 +860,11 @@ export class Preferences extends React.Component<
     if (this.state.selectedExternalEditor) {
       await dispatcher.setExternalEditor(this.state.selectedExternalEditor)
     }
+    if (this.state.selectedSecondaryExternalEditor) {
+      await dispatcher.setSecondaryExternalEditor(
+        this.state.selectedSecondaryExternalEditor
+      )
+    }
     await dispatcher.setShell(this.state.selectedShell)
     await dispatcher.setConfirmDiscardChangesSetting(
       this.state.confirmDiscardChanges
@@ -831,5 +886,17 @@ export class Preferences extends React.Component<
 
   private onTabClicked = (index: number) => {
     this.setState({ selectedIndex: index })
+  }
+
+  private onCustomUseSecondaryEditorChanged = (
+    useCustomSecondaryEditor: boolean
+  ) => {
+    this.setState({ useCustomSecondaryEditor })
+  }
+
+  private onCustomSecondaryEditorChanged = (
+    customSecondaryEditor: ICustomIntegration
+  ) => {
+    this.setState({ customSecondaryEditor })
   }
 }

@@ -444,8 +444,8 @@ const pullRequestSuggestedNextActionKey =
 export const useCustomEditorKey = 'use-custom-editor'
 const customEditorKey = 'custom-editor'
 
-export const useSecondaryCustomEditorKey = 'use-secondary-custom-editor'
-const secondaryCustomEditorKey = 'secondary-custom-editor'
+export const useCustomSecondaryEditorKey = 'use-secondary-custom-editor'
+const customSecondaryEditorKey = 'secondary-custom-editor'
 
 export const useCustomShellKey = 'use-custom-shell'
 const customShellKey = 'custom-shell'
@@ -598,8 +598,8 @@ export class AppStore extends TypedBaseStore<IAppState> {
   private useCustomEditor: boolean = false
   private customEditor: ICustomIntegration | null = null
 
-  private useSecondaryCustomEditor: boolean = false
-  private secondaryCustomEditor: ICustomIntegration | null = null
+  private useCustomSecondaryEditor: boolean = false
+  private customSecondaryEditor: ICustomIntegration | null = null
 
   private useCustomShell: boolean = false
   private customShell: ICustomIntegration | null = null
@@ -1107,8 +1107,8 @@ export class AppStore extends TypedBaseStore<IAppState> {
       lastThankYou: this.lastThankYou,
       useCustomEditor: this.useCustomEditor,
       customEditor: this.customEditor,
-      useSecondaryCustomEditor: this.useSecondaryCustomEditor,
-      secondaryCustomEditor: this.secondaryCustomEditor,
+      useCustomSecondaryEditor: this.useCustomSecondaryEditor,
+      customSecondaryEditor: this.customSecondaryEditor,
       useCustomShell: this.useCustomShell,
       customShell: this.customShell,
       showCIStatusPopover: this.showCIStatusPopover,
@@ -2322,9 +2322,9 @@ export class AppStore extends TypedBaseStore<IAppState> {
       enableCustomIntegration() && getBoolean(useCustomEditorKey, false)
     this.customEditor = getObject<ICustomIntegration>(customEditorKey) ?? null
 
-    this.useSecondaryCustomEditor =
-      enableCustomIntegration() && getBoolean(useSecondaryCustomEditorKey, false)
-    this.secondaryCustomEditor = getObject<ICustomIntegration>(secondaryCustomEditorKey) ?? null
+    this.useCustomSecondaryEditor =
+      enableCustomIntegration() && getBoolean(useCustomSecondaryEditorKey, false)
+    this.customSecondaryEditor = getObject<ICustomIntegration>(customSecondaryEditorKey) ?? null
 
     this.useCustomShell =
       enableCustomIntegration() && getBoolean(useCustomShellKey, false)
@@ -2559,7 +2559,7 @@ export class AppStore extends TypedBaseStore<IAppState> {
       selectedRepository,
       useCustomEditor,
       selectedExternalEditor,
-      useSecondaryCustomEditor,
+      useCustomSecondaryEditor,
       selectedSecondaryExternalEditor,
       askForConfirmationOnRepositoryRemoval,
       askForConfirmationOnForcePush,
@@ -2568,7 +2568,7 @@ export class AppStore extends TypedBaseStore<IAppState> {
     const labels: MenuLabelsEvent = {
       selectedShell: useCustomShell ? null : selectedShell,
       selectedExternalEditor: useCustomEditor ? null : selectedExternalEditor,
-      selectedSecondaryExternalEditor: useSecondaryCustomEditor ? null : selectedSecondaryExternalEditor,
+      selectedSecondaryExternalEditor: useCustomSecondaryEditor ? null : selectedSecondaryExternalEditor,
       askForConfirmationOnRepositoryRemoval,
       askForConfirmationOnForcePush,
     }
@@ -5874,17 +5874,13 @@ export class AppStore extends TypedBaseStore<IAppState> {
     }
   }
 
-    /** Open a path to a repository or file using the user's configured secondary editor */
+  /** Open a path to a repository or file using the user's configured secondary editor */
   public async _openInSecondaryExternalEditor(fullPath: string): Promise<void> {
-    const {
-      selectedSecondaryExternalEditor,
-      useSecondaryCustomEditor,
-      secondaryCustomEditor,
-    } = this.getState()
+    const { selectedSecondaryExternalEditor, useCustomSecondaryEditor, customSecondaryEditor } = this.getState()
 
     try {
-      if (useSecondaryCustomEditor && secondaryCustomEditor) {
-        await launchCustomExternalEditor(fullPath, secondaryCustomEditor)
+      if (useCustomSecondaryEditor && customSecondaryEditor) {
+        await launchCustomExternalEditor(fullPath, customSecondaryEditor)
       } else {
         const match = await findEditorOrDefault(selectedSecondaryExternalEditor)
         if (match === null) {
@@ -7571,9 +7567,9 @@ export class AppStore extends TypedBaseStore<IAppState> {
     this.emitUpdate()
   }
 
-  public _setUseSecondaryCustomEditor(useSecondaryCustomEditor: boolean) {
-    setBoolean(useSecondaryCustomEditorKey, useSecondaryCustomEditor)
-    this.useSecondaryCustomEditor = useSecondaryCustomEditor
+  public _setUseCustomSecondaryEditor(useCustomSecondaryEditor: boolean) {
+    setBoolean(useCustomSecondaryEditorKey, useCustomSecondaryEditor)
+    this.useCustomSecondaryEditor = useCustomSecondaryEditor
     this.emitUpdate()
   }
 
@@ -7583,9 +7579,9 @@ export class AppStore extends TypedBaseStore<IAppState> {
     this.emitUpdate()
   }
 
-  public _setSecondaryCustomEditor(secondaryCustomEditor: ICustomIntegration) {
-    setObject(secondaryCustomEditorKey, secondaryCustomEditor)
-    this.secondaryCustomEditor = secondaryCustomEditor
+  public _setCustomSecondaryEditor(customSecondaryEditor: ICustomIntegration) {
+    setObject(customSecondaryEditorKey, customSecondaryEditor)
+    this.customSecondaryEditor = customSecondaryEditor
     this.emitUpdate()
   }
 
