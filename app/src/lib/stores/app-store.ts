@@ -402,6 +402,7 @@ const confirmCommitFilteredChangesKey: string =
 const uncommittedChangesStrategyKey = 'uncommittedChangesStrategyKind'
 
 const externalEditorKey: string = 'externalEditor'
+const secondaryExternalEditorKey: string = 'secondaryExternalEditor'
 
 const imageDiffTypeDefault = ImageDiffType.TwoUp
 const imageDiffTypeKey = 'image-diff-type'
@@ -442,6 +443,9 @@ const pullRequestSuggestedNextActionKey =
 
 export const useCustomEditorKey = 'use-custom-editor'
 const customEditorKey = 'custom-editor'
+
+export const useSecondaryCustomEditorKey = 'use-secondary-custom-editor'
+const secondaryCustomEditorKey = 'secondary-custom-editor'
 
 export const useCustomShellKey = 'use-custom-shell'
 const customShellKey = 'custom-shell'
@@ -552,6 +556,10 @@ export class AppStore extends TypedBaseStore<IAppState> {
 
   private resolvedExternalEditor: string | null = null
 
+  private selectedSecondaryExternalEditor: string | null = null
+
+  private resolvedSecondaryExternalEditor: string | null = null
+
   /** The user's preferred shell. */
   private selectedShell: Shell = DefaultShell
 
@@ -589,6 +597,9 @@ export class AppStore extends TypedBaseStore<IAppState> {
 
   private useCustomEditor: boolean = false
   private customEditor: ICustomIntegration | null = null
+
+  private useSecondaryCustomEditor: boolean = false
+  private secondaryCustomEditor: ICustomIntegration | null = null
 
   private useCustomShell: boolean = false
   private customShell: ICustomIntegration | null = null
@@ -1070,6 +1081,7 @@ export class AppStore extends TypedBaseStore<IAppState> {
         this.confirmCommitFilteredChanges,
       uncommittedChangesStrategy: this.uncommittedChangesStrategy,
       selectedExternalEditor: this.selectedExternalEditor,
+      selectedSecondaryExternalEditor: this.selectedSecondaryExternalEditor,
       imageDiffType: this.imageDiffType,
       hideWhitespaceInChangesDiff: this.hideWhitespaceInChangesDiff,
       hideWhitespaceInHistoryDiff: this.hideWhitespaceInHistoryDiff,
@@ -1078,6 +1090,7 @@ export class AppStore extends TypedBaseStore<IAppState> {
       selectedShell: this.selectedShell,
       repositoryFilterText: this.repositoryFilterText,
       resolvedExternalEditor: this.resolvedExternalEditor,
+      resolvedSecondaryExternalEditor: this.resolvedSecondaryExternalEditor,
       selectedCloneRepositoryTab: this.selectedCloneRepositoryTab,
       selectedBranchesTab: this.selectedBranchesTab,
       selectedTheme: this.selectedTheme,
@@ -1094,6 +1107,8 @@ export class AppStore extends TypedBaseStore<IAppState> {
       lastThankYou: this.lastThankYou,
       useCustomEditor: this.useCustomEditor,
       customEditor: this.customEditor,
+      useSecondaryCustomEditor: this.useSecondaryCustomEditor,
+      secondaryCustomEditor: this.secondaryCustomEditor,
       useCustomShell: this.useCustomShell,
       customShell: this.customShell,
       showCIStatusPopover: this.showCIStatusPopover,
@@ -2255,6 +2270,10 @@ export class AppStore extends TypedBaseStore<IAppState> {
       await this.lookupSelectedExternalEditor()
     ).catch(e => log.error('Failed resolving current editor at startup', e))
 
+    this.updateSelectedSecondaryExternalEditor(
+      await this.lookupSelectedSecondaryExternalEditor()
+    ).catch(e => log.error('Failed resolving current secondary editor at startup', e))
+
     const shellValue = localStorage.getItem(shellKey)
     this.selectedShell = shellValue ? parseShell(shellValue) : DefaultShell
 
@@ -2302,6 +2321,10 @@ export class AppStore extends TypedBaseStore<IAppState> {
     this.useCustomEditor =
       enableCustomIntegration() && getBoolean(useCustomEditorKey, false)
     this.customEditor = getObject<ICustomIntegration>(customEditorKey) ?? null
+
+    this.useSecondaryCustomEditor =
+      enableCustomIntegration() && getBoolean(useSecondaryCustomEditorKey, false)
+    this.secondaryCustomEditor = getObject<ICustomIntegration>(secondaryCustomEditorKey) ?? null
 
     this.useCustomShell =
       enableCustomIntegration() && getBoolean(useCustomShellKey, false)
@@ -2460,6 +2483,16 @@ export class AppStore extends TypedBaseStore<IAppState> {
     return this._resolveCurrentEditor()
   }
 
+  private updateSelectedSecondaryExternalEditor(
+    selectedEditor: string | null
+  ): Promise<void> {
+    this.selectedSecondaryExternalEditor = selectedEditor
+
+    // Make sure we keep the resolved (cached) editor
+    // in sync when the user changes their editor choice.
+    return this._resolveCurrentSecondaryEditor()
+  }
+
   private async lookupSelectedExternalEditor(): Promise<string | null> {
     const editors = (await getAvailableEditors()).map(found => found.editor)
 
@@ -2476,6 +2509,20 @@ export class AppStore extends TypedBaseStore<IAppState> {
       return value
     }
 
+    return null
+  }
+
+  private async lookupSelectedSecondaryExternalEditor(): Promise<string | null> {
+    const editors = (await getAvailableEditors()).map(found => found.editor)
+
+    const value = localStorage.getItem(secondaryExternalEditorKey)
+    // ensure editor is still installed
+    if (value && editors.includes(value)) {
+      return value
+    }
+
+    // For secondary editor, we don't set a default automatically.
+    // It remains null until the user explicitly picks one.
     return null
   }
 
@@ -2512,6 +2559,8 @@ export class AppStore extends TypedBaseStore<IAppState> {
       selectedRepository,
       useCustomEditor,
       selectedExternalEditor,
+      useSecondaryCustomEditor,
+      selectedSecondaryExternalEditor,
       askForConfirmationOnRepositoryRemoval,
       askForConfirmationOnForcePush,
     } = this
@@ -2519,6 +2568,7 @@ export class AppStore extends TypedBaseStore<IAppState> {
     const labels: MenuLabelsEvent = {
       selectedShell: useCustomShell ? null : selectedShell,
       selectedExternalEditor: useCustomEditor ? null : selectedExternalEditor,
+      selectedSecondaryExternalEditor: useSecondaryCustomEditor ? null : selectedSecondaryExternalEditor,
       askForConfirmationOnRepositoryRemoval,
       askForConfirmationOnForcePush,
     }
@@ -6899,8 +6949,30 @@ export class AppStore extends TypedBaseStore<IAppState> {
     }
   }
 
+  public async _resolveCurrentSecondaryEditor() {
+    const match = await findEditorOrDefault(this.selectedSecondaryExternalEditor)
+    const resolvedSecondaryExternalEditor = match != null ? match.editor : null
+    if (this.resolvedSecondaryExternalEditor !== resolvedSecondaryExternalEditor) {
+      this.resolvedSecondaryExternalEditor = resolvedSecondaryExternalEditor
+
+      // Make sure we let the tutorial assessor know that we have a new editor
+      // in case it's stuck waiting for one to be selected.
+      if (this.currentOnboardingTutorialStep === TutorialStep.PickEditor) {
+        if (this.selectedRepository instanceof Repository) {
+          this.updateCurrentTutorialStep(this.selectedRepository)
+        }
+      }
+
+      this.emitUpdate()
+    }
+  }
+
   public getResolvedExternalEditor = () => {
     return this.resolvedExternalEditor
+  }
+
+  public getResolvedSecondaryExternalEditor = () => {
+    return this.resolvedSecondaryExternalEditor
   }
 
   /** This shouldn't be called directly. See `Dispatcher`. */

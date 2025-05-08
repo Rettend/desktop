@@ -18,6 +18,14 @@ export type MenuLabelsEvent = {
   readonly selectedExternalEditor: string | null
 
   /**
+   * Specify the user's selected secondary editor to display in the menu.
+   *
+   * Specify `null` to indicate that it is not known currently, which will
+   * default to a placeholder based on the current platform.
+   */
+  readonly selectedSecondaryExternalEditor: string | null
+
+  /**
    * Has the use enabled "Show confirmation dialog before force pushing"?
    */
   readonly askForConfirmationOnForcePush: boolean

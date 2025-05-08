@@ -242,6 +242,9 @@ export interface IAppState {
   /** The external editor to use when opening repositories */
   readonly selectedExternalEditor: string | null
 
+  /** The secondary external editor to use when opening repositories */
+  readonly selectedSecondaryExternalEditor: string | null
+
   /** Whether or not the app should use Windows' OpenSSH client */
   readonly useWindowsOpenSSH: boolean
 
@@ -259,6 +262,12 @@ export interface IAppState {
    *  - If no editors found, this will remain `null`
    */
   readonly resolvedExternalEditor: string | null
+
+  /**
+   * A cached entry representing a secondary external editor found on the user's machine.
+   * Similar logic to resolvedExternalEditor.
+   */
+  readonly resolvedSecondaryExternalEditor: string | null
 
   /** What type of visual diff mode we should use to compare images */
   readonly imageDiffType: ImageDiffType
@@ -340,6 +349,12 @@ export interface IAppState {
 
   /** Info needed to launch a custom editor chosen by the user. */
   readonly customEditor: ICustomIntegration | null
+
+  /** Whether or not the user wants to use a secondary custom editor. */
+  readonly useSecondaryCustomEditor: boolean
+
+  /** Info needed to launch a secondary custom editor chosen by the user. */
+  readonly secondaryCustomEditor: ICustomIntegration | null
 
   /** Whether or not the user wants to use a custom shell. */
   readonly useCustomShell: boolean
