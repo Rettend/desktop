@@ -370,7 +370,7 @@ export function buildDefaultMenu({
           ? `Open in ${selectedSecondaryExternalEditor ?? 'Secondary External Editor'}`
           : `Open in ${selectedSecondaryExternalEditor ?? 'secondary external editor'}`,
         id: 'open-secondary-external-editor',
-        accelerator: 'CmdOrCtrl+Alt+A',
+        accelerator: 'CmdOrCtrl+Shift+X',
         click: emit('open-secondary-external-editor'),
         enabled: selectedSecondaryExternalEditor !== null,
       },

@@ -3419,7 +3419,8 @@ export class App extends React.Component<IAppProps, IAppState> {
             state.useCustomEditor || state.selectedExternalEditor !== null
           }
           isSecondaryExternalEditorAvailable={
-            state.useCustomSecondaryEditor || state.selectedSecondaryExternalEditor !== null
+            state.useCustomSecondaryEditor ||
+            state.selectedSecondaryExternalEditor !== null
           }
           externalEditorLabel={externalEditorLabel}
           secondaryExternalEditorLabel={secondaryExternalEditorLabel}
