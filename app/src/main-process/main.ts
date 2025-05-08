@@ -420,7 +420,8 @@ app.on('ready', () => {
         // item since it'll be the most recent reflection of
         // what the renderer wants.
         if (currentItem.enabled !== newItem.enabled) {
-          newItem.enabled = currentItem.enabled
+          // TODO: without this the 'Open in secondary editor' menu item and no-changes view button are not enabled
+          // newItem.enabled = currentItem.enabled
           menuHasChanged = true
         }
       }

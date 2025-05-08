@@ -43,8 +43,8 @@ interface IIntegrationsPreferencesState {
   readonly selectedSecondaryExternalEditor: string | null
   readonly selectedShell: Shell
   readonly useCustomEditor: boolean
-  readonly customEditor: ICustomIntegration
   readonly useCustomSecondaryEditor: boolean
+  readonly customEditor: ICustomIntegration
   readonly customSecondaryEditor: ICustomIntegration
   readonly useCustomShell: boolean
   readonly customShell: ICustomIntegration
@@ -68,8 +68,8 @@ export class Integrations extends React.Component<
         this.props.selectedSecondaryExternalEditor,
       selectedShell: this.props.selectedShell,
       useCustomEditor: this.props.useCustomEditor,
-      customEditor: this.props.customEditor,
       useCustomSecondaryEditor: this.props.useCustomSecondaryEditor,
+      customEditor: this.props.customEditor,
       customSecondaryEditor: this.props.customSecondaryEditor ?? {
         path: '',
         arguments: '',
@@ -539,8 +539,7 @@ export class Integrations extends React.Component<
             </h2>
           </legend>
           <Row>{this.renderSecondaryExternalEditor()}</Row>
-          {this.state.useCustomSecondaryEditor &&
-            this.renderCustomSecondaryExternalEditor()}
+          {this.state.useCustomSecondaryEditor && this.renderCustomSecondaryExternalEditor()}
         </fieldset>
         <fieldset>
           <legend>
