@@ -81,6 +81,17 @@ interface INoChangesProps {
    */
   readonly isExternalEditorAvailable: boolean
 
+  /**
+   * Whether or not the user has a configured secondary
+   * external editor.
+   */
+  readonly isSecondaryExternalEditorAvailable: boolean
+
+  /**
+   * The display name of the configured secondary external editor.
+   */
+  readonly selectedSecondaryExternalEditorName: string | null
+
   /** The user's preference of pull request suggested next action to use **/
   readonly pullRequestSuggestedNextAction?: PullRequestSuggestedNextAction
 }
@@ -342,6 +353,58 @@ export class NoChanges extends React.Component<
 
   private onOpenInExternalEditorClicked = () =>
     this.props.dispatcher.incrementMetric('suggestedStepOpenInExternalEditor')
+
+  private renderOpenInSecondaryExternalEditor() {
+    if (!this.props.isSecondaryExternalEditorAvailable) {
+      return null
+    }
+
+    const itemId: MenuIDs = 'open-secondary-external-editor'
+    const menuItem = this.getMenuItemInfo(itemId)
+
+    if (menuItem === undefined) {
+      log.error(`Could not find matching menu item for ${itemId}`)
+    }
+
+    const editorName =
+      this.props.selectedSecondaryExternalEditorName || 'Secondary Editor'
+    const title = `Open the repository in ${editorName}`
+
+    const description = (
+      <>
+        Select your secondary editor in{' '}
+        <LinkButton onClick={this.openIntegrationPreferences}>
+          {__DARWIN__ ? 'Settings' : 'Options'}
+        </LinkButton>
+      </>
+    )
+
+    const discoverabilityContent = menuItem
+      ? this.renderDiscoverabilityElements(menuItem)
+      : 'Configure shortcut in menu (View -> Keyboard Shortcuts)'
+
+    return (
+      <MenuBackedSuggestedAction
+        title={title}
+        description={description}
+        discoverabilityContent={discoverabilityContent}
+        menuItemId={itemId}
+        buttonText={
+          menuItem
+            ? formatMenuItemLabel(menuItem.label)
+            : `Open in ${editorName}`
+        }
+        disabled={menuItem ? !menuItem.enabled : false}
+        onClick={this.onOpenInSecondaryExternalEditorClicked}
+      />
+    )
+  }
+
+  private onOpenInSecondaryExternalEditorClicked = () => {
+    this.props.dispatcher.incrementMetric(
+      'suggestedStepOpenInSecondaryExternalEditor'
+    )
+  }
 
   private renderRemoteAction() {
     const { remote, aheadBehind, branchesState, tagsToPush } =
@@ -740,6 +803,7 @@ export class NoChanges extends React.Component<
         </SuggestedActionGroup>
         <SuggestedActionGroup>
           {this.renderOpenInExternalEditor()}
+          {this.renderOpenInSecondaryExternalEditor()}
           {this.renderShowInFileManager()}
           {this.renderViewOnGitHub()}
         </SuggestedActionGroup>
