@@ -473,7 +473,9 @@ export class RepositoryView extends React.Component<
         commitSummaryWidth={this.props.commitSummaryWidth}
         selectedDiffType={this.props.imageDiffType}
         externalEditorLabel={this.props.externalEditorLabel}
+        secondaryExternalEditorLabel={this.props.secondaryExternalEditorLabel}
         onOpenInExternalEditor={this.props.onOpenInExternalEditor}
+        onOpenInSecondaryExternalEditor={this.props.onOpenInSecondaryExternalEditor}
         onViewCommitOnGitHub={this.props.onViewCommitOnGitHub}
         hideWhitespaceInDiff={this.props.hideWhitespaceInHistoryDiff}
         showSideBySideDiff={this.props.showSideBySideDiff}

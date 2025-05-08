@@ -44,6 +44,9 @@ Some initial work has been done, primarily in `app-store.ts`, `app-state.ts`, an
         - Added `onOpenInSecondaryExternalEditorClicked` handler to increment a metric (metric name `'suggestedStepOpenInSecondaryExternalEditor'` needs to be defined).
         - The button relies on a menu item ID `'open-secondary-external-editor'` which will trigger the actual editor opening logic via `app.tsx`.
     - **Alternative: Toolbar button:** Add button, connect to dispatcher.
+    - **Diff View Context Menus (`app/src/ui/history/selected-commits.tsx`) (DONE):**
+        - Added `secondaryExternalEditorLabel` and `onOpenInSecondaryExternalEditor` props to `ISelectedCommitsProps`.
+        - Context menu for files in commit history now includes "Open in Secondary External Editor".
     - **Dispatcher (`app/src/ui/dispatcher/dispatcher.ts`) (DONE):**
         - Add `openInSecondaryExternalEditor(fullPath: string)` action (should call `appStore._openInSecondaryExternalEditor`). This is referenced by the menu event handler in `app.tsx`.
         - Define the metric name `'suggestedStepOpenInSecondaryExternalEditor'`.

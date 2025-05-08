@@ -53,6 +53,8 @@ interface ISelectedCommitsProps {
   readonly selectedDiffType: ImageDiffType
   /** The name of the currently selected external editor */
   readonly externalEditorLabel?: string
+  /** The name of the currently selected secondary external editor */
+  readonly secondaryExternalEditorLabel?: string
 
   /**
    * Called to open a file using the user's configured applications
@@ -60,6 +62,12 @@ interface ISelectedCommitsProps {
    * @param path The path of the file relative to the root of the repository
    */
   readonly onOpenInExternalEditor: (path: string) => void
+  /**
+   * Called to open a file using the user's configured secondary external editor
+   *
+   * @param path The path of the file relative to the root of the repository
+   */
+  readonly onOpenInSecondaryExternalEditor: (path: string) => void
   readonly onViewCommitOnGitHub: (SHA: string, filePath?: string) => void
   readonly hideWhitespaceInDiff: boolean
 
@@ -379,6 +387,8 @@ export class SelectedCommits extends React.Component<
       localCommitSHAs,
       repository,
       externalEditorLabel,
+      secondaryExternalEditorLabel,
+      onOpenInSecondaryExternalEditor,
     } = this.props
 
     const fullPath = Path.join(repository.path, file.path)
@@ -413,6 +423,17 @@ export class SelectedCommits extends React.Component<
         action: () => this.props.onOpenInExternalEditor(file.path),
         enabled: fileExistsOnDisk,
       },
+    ]
+
+    if (secondaryExternalEditorLabel && onOpenInSecondaryExternalEditor) {
+      items.push({
+        label: `Open in ${secondaryExternalEditorLabel}`,
+        action: () => onOpenInSecondaryExternalEditor(file.path),
+        enabled: fileExistsOnDisk,
+      })
+    }
+
+    items.push(
       {
         label: OpenWithDefaultProgramLabel,
         action: () => this.onOpenItem(file.path),
@@ -427,8 +448,8 @@ export class SelectedCommits extends React.Component<
         label: CopyRelativeFilePathLabel,
         action: () => clipboard.writeText(Path.normalize(file.path)),
       },
-      { type: 'separator' },
-    ]
+      { type: 'separator' }
+    )
 
     let viewOnGitHubLabel = 'View on GitHub'
     const gitHubRepository = repository.gitHubRepository

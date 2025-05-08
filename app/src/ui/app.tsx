@@ -3365,6 +3365,10 @@ export class App extends React.Component<IAppProps, IAppState> {
         ? undefined
         : state.selectedExternalEditor ?? undefined
 
+      const secondaryExternalEditorLabel = state.useCustomEditor
+        ? undefined
+        : state.selectedSecondaryExternalEditor ?? undefined
+
       return (
         <RepositoryView
           ref={this.repositoryViewRef}
@@ -3403,8 +3407,15 @@ export class App extends React.Component<IAppProps, IAppState> {
           isExternalEditorAvailable={
             state.useCustomEditor || state.selectedExternalEditor !== null
           }
+          isSecondaryExternalEditorAvailable={
+            state.useCustomEditor || state.selectedSecondaryExternalEditor !== null
+          }
           externalEditorLabel={externalEditorLabel}
+          secondaryExternalEditorLabel={secondaryExternalEditorLabel}
           resolvedExternalEditor={state.resolvedExternalEditor}
+          selectedSecondaryExternalEditorName={
+            state.selectedSecondaryExternalEditor
+          }
           onOpenInExternalEditor={this.onOpenInExternalEditor}
           onOpenInSecondaryExternalEditor={this.onOpenInSecondaryExternalEditor}
           appMenu={state.appMenuState[0]}
