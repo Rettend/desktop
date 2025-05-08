@@ -5,6 +5,7 @@ import { clipboard } from 'electron'
 import {
   RevealInFileManagerLabel,
   DefaultEditorLabel,
+  DefaultSecondaryEditorLabel,
   DefaultShellLabel,
 } from '../lib/context-menu'
 
@@ -12,11 +13,13 @@ interface IRepositoryListItemContextMenuConfig {
   repository: Repositoryish
   shellLabel: string | undefined
   externalEditorLabel: string | undefined
+  secondaryExternalEditorLabel: string | undefined
   askForConfirmationOnRemoveRepository: boolean
   onViewOnGitHub: (repository: Repositoryish) => void
   onOpenInShell: (repository: Repositoryish) => void
   onShowRepository: (repository: Repositoryish) => void
   onOpenInExternalEditor: (repository: Repositoryish) => void
+  onOpenInSecondaryExternalEditor: (repository: Repositoryish) => void
   onRemoveRepository: (repository: Repositoryish) => void
   onChangeRepositoryAlias: (repository: Repository) => void
   onRemoveRepositoryAlias: (repository: Repository) => void
@@ -32,6 +35,9 @@ export const generateRepositoryListContextMenu = (
   const openInExternalEditor = config.externalEditorLabel
     ? `Open in ${config.externalEditorLabel}`
     : DefaultEditorLabel
+  const openInSecondaryExternalEditor = config.secondaryExternalEditorLabel
+    ? `Open in ${config.secondaryExternalEditorLabel}`
+    : DefaultSecondaryEditorLabel
   const openInShell = config.shellLabel
     ? `Open in ${config.shellLabel}`
     : DefaultShellLabel
@@ -65,6 +71,11 @@ export const generateRepositoryListContextMenu = (
     {
       label: openInExternalEditor,
       action: () => config.onOpenInExternalEditor(repository),
+      enabled: !missing,
+    },
+    {
+      label: openInSecondaryExternalEditor,
+      action: () => config.onOpenInSecondaryExternalEditor(repository),
       enabled: !missing,
     },
     { type: 'separator' },

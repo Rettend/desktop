@@ -80,11 +80,22 @@ interface IRepositoryViewProps {
    */
   readonly isExternalEditorAvailable: boolean
 
+  /**
+   * Whether or not the user has a configured secondary external editor.
+   */
+  readonly isSecondaryExternalEditorAvailable: boolean
+
   /** The name of the currently selected external editor */
   readonly externalEditorLabel?: string
 
+  /** The name of the currently selected secondary external editor */
+  readonly secondaryExternalEditorLabel?: string
+
   /** A cached entry representing an external editor found on the user's machine */
   readonly resolvedExternalEditor: string | null
+
+  /** The name of the currently selected secondary external editor */
+  readonly selectedSecondaryExternalEditorName: string | null
 
   /**
    * Callback to open a selected file using the configured external editor
@@ -92,6 +103,13 @@ interface IRepositoryViewProps {
    * @param fullPath The full path to the file on disk
    */
   readonly onOpenInExternalEditor: (fullPath: string) => void
+
+  /**
+   * Callback to open a selected file using the configured secondary external editor
+   *
+   * @param fullPath The full path to the file on disk
+   */
+  readonly onOpenInSecondaryExternalEditor: (fullPath: string) => void
 
   /**
    * The top-level application menu item.
@@ -262,7 +280,9 @@ export class RepositoryView extends React.Component<
         isShowingModal={this.props.isShowingModal}
         isShowingFoldout={this.props.isShowingFoldout}
         externalEditorLabel={this.props.externalEditorLabel}
+        secondaryExternalEditorLabel={this.props.secondaryExternalEditorLabel}
         onOpenInExternalEditor={this.props.onOpenInExternalEditor}
+        onOpenInSecondaryExternalEditor={this.props.onOpenInSecondaryExternalEditor}
         onChangesListScrolled={this.onChangesListScrolled}
         changesListScrollTop={scrollTop}
         shouldNudgeToCommit={
@@ -523,6 +543,8 @@ export class RepositoryView extends React.Component<
             repository={this.props.repository}
             repositoryState={this.props.state}
             isExternalEditorAvailable={this.props.isExternalEditorAvailable}
+            isSecondaryExternalEditorAvailable={this.props.isSecondaryExternalEditorAvailable}
+            selectedSecondaryExternalEditorName={this.props.selectedSecondaryExternalEditorName}
             dispatcher={this.props.dispatcher}
             pullRequestSuggestedNextAction={
               this.props.pullRequestSuggestedNextAction

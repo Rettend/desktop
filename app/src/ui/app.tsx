@@ -517,6 +517,8 @@ export class App extends React.Component<IAppProps, IAppState> {
         return uninstallWindowsCLI()
       case 'open-external-editor':
         return this.openCurrentRepositoryInExternalEditor()
+      case 'open-secondary-external-editor':
+        return this.openCurrentRepositoryInSecondaryExternalEditor()
       case 'select-all':
         return this.selectAll()
       case 'show-stashed-changes':
@@ -1315,6 +1317,15 @@ export class App extends React.Component<IAppProps, IAppState> {
     }
 
     this.openInExternalEditor(repository)
+  }
+
+  private openCurrentRepositoryInSecondaryExternalEditor() {
+    const repository = this.getRepository()
+    if (!repository) {
+      return
+    }
+
+    this.openInSecondaryExternalEditor(repository)
   }
 
   /**
@@ -2880,6 +2891,16 @@ export class App extends React.Component<IAppProps, IAppState> {
     this.props.dispatcher.openInExternalEditor(repository.path)
   }
 
+  private openInSecondaryExternalEditor = (
+    repository: Repository | CloningRepository
+  ) => {
+    if (!(repository instanceof Repository)) {
+      return
+    }
+
+    this.props.dispatcher.openInSecondaryExternalEditor(repository.path)
+  }
+
   private onOpenInExternalEditor = (path: string) => {
     const repository = this.state.selectedState?.repository
     if (repository === undefined) {
@@ -2888,6 +2909,16 @@ export class App extends React.Component<IAppProps, IAppState> {
 
     const fullPath = Path.join(repository.path, path)
     this.props.dispatcher.openInExternalEditor(fullPath)
+  }
+
+  private onOpenInSecondaryExternalEditor = (path: string) => {
+    const repository = this.state.selectedState?.repository
+    if (repository === undefined) {
+      return
+    }
+
+    const fullPath = Path.join(repository.path, path)
+    this.props.dispatcher.openInSecondaryExternalEditor(fullPath)
   }
 
   private showRepository = (repository: Repository | CloningRepository) => {
@@ -2988,6 +3019,7 @@ export class App extends React.Component<IAppProps, IAppState> {
     }
 
     const externalEditorLabel = this.state.selectedExternalEditor ?? undefined
+    const secondaryExternalEditorLabel = this.state.selectedSecondaryExternalEditor ?? undefined
 
     const onChangeRepositoryAlias = (repository: Repository) => {
       this.props.dispatcher.showPopup({
@@ -3005,9 +3037,11 @@ export class App extends React.Component<IAppProps, IAppState> {
       onShowRepository: this.showRepository,
       onOpenInShell: this.openInShell,
       onOpenInExternalEditor: this.openInExternalEditor,
+      onOpenInSecondaryExternalEditor: this.openInSecondaryExternalEditor,
       askForConfirmationOnRemoveRepository:
         this.state.askForConfirmationOnRepositoryRemoval,
       externalEditorLabel: externalEditorLabel,
+      secondaryExternalEditorLabel: secondaryExternalEditorLabel,
       onChangeRepositoryAlias: onChangeRepositoryAlias,
       onRemoveRepositoryAlias: onRemoveRepositoryAlias,
       onViewOnGitHub: this.viewOnGitHub,
@@ -3372,6 +3406,7 @@ export class App extends React.Component<IAppProps, IAppState> {
           externalEditorLabel={externalEditorLabel}
           resolvedExternalEditor={state.resolvedExternalEditor}
           onOpenInExternalEditor={this.onOpenInExternalEditor}
+          onOpenInSecondaryExternalEditor={this.onOpenInSecondaryExternalEditor}
           appMenu={state.appMenuState[0]}
           currentTutorialStep={state.currentOnboardingTutorialStep}
           onExitTutorial={this.onExitTutorial}

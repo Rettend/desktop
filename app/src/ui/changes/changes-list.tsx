@@ -167,6 +167,13 @@ interface IChangesListProps {
   readonly onOpenItemInExternalEditor: (path: string) => void
 
   /**
+   * Called to open a file in the secondary external editor
+   *
+   * @param path The path of the file relative to the root of the repository
+   */
+  readonly onOpenItemInSecondaryExternalEditor: (path: string) => void
+
+  /**
    * The currently checked out branch (null if no branch is checked out).
    */
   readonly branch: string | null
@@ -213,6 +220,9 @@ interface IChangesListProps {
 
   /** The name of the currently selected external editor */
   readonly externalEditorLabel?: string
+
+  /** The name of the currently selected secondary external editor */
+  readonly secondaryExternalEditorLabel?: string
 
   readonly stashEntry: IStashEntry | null
 
@@ -526,6 +536,25 @@ export class ChangesList extends React.Component<
     }
   }
 
+  private getOpenInSecondaryExternalEditorMenuItem = (
+    file: WorkingDirectoryFileChange,
+    enabled: boolean
+  ): IMenuItem => {
+    const { secondaryExternalEditorLabel } = this.props
+
+    const openInSecondaryExternalEditor = secondaryExternalEditorLabel
+      ? `Open in ${secondaryExternalEditorLabel}`
+      : DefaultEditorLabel
+
+    return {
+      label: openInSecondaryExternalEditor,
+      action: () => {
+        this.props.onOpenItemInSecondaryExternalEditor(file.path)
+      },
+      enabled,
+    }
+  }
+
   private getDefaultContextMenu(
     file: WorkingDirectoryFileChange
   ): ReadonlyArray<IMenuItem> {
@@ -664,6 +693,7 @@ export class ChangesList extends React.Component<
       { type: 'separator' },
       this.getRevealInFileManagerMenuItem(file),
       this.getOpenInExternalEditorMenuItem(file, enabled),
+      this.getOpenInSecondaryExternalEditorMenuItem(file, enabled),
       {
         label: OpenWithDefaultProgramLabel,
         action: () => this.props.onOpenItem(path),
@@ -698,6 +728,7 @@ export class ChangesList extends React.Component<
       { type: 'separator' },
       this.getRevealInFileManagerMenuItem(file),
       this.getOpenInExternalEditorMenuItem(file, enabled),
+      this.getOpenInSecondaryExternalEditorMenuItem(file, enabled),
       {
         label: OpenWithDefaultProgramLabel,
         action: () => this.props.onOpenItem(path),

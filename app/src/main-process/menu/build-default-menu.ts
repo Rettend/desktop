@@ -38,6 +38,7 @@ export const separator: Electron.MenuItemConstructorOptions = {
 
 export function buildDefaultMenu({
   selectedExternalEditor,
+  selectedSecondaryExternalEditor,
   selectedShell,
   askForConfirmationOnForcePush,
   askForConfirmationOnRepositoryRemoval,
@@ -216,17 +217,16 @@ export function buildDefaultMenu({
       },
       ...(enableFilteredChangesList()
         ? [
-            {
-              label: __DARWIN__
-                ? `${isChangesFilterVisible ? 'Hide' : 'Show'} Changes Filter`
-                : `${
-                    isChangesFilterVisible ? 'Hide' : 'Show'
-                  } Toggle Chan&ges Filter`,
-              id: 'toggle-changes-filter',
-              accelerator: 'CmdOrCtrl+L',
-              click: emit('toggle-changes-filter'),
-            },
-          ]
+          {
+            label: __DARWIN__
+              ? `${isChangesFilterVisible ? 'Hide' : 'Show'} Changes Filter`
+              : `${isChangesFilterVisible ? 'Hide' : 'Show'
+              } Toggle Chan&ges Filter`,
+            id: 'toggle-changes-filter',
+            accelerator: 'CmdOrCtrl+L',
+            click: emit('toggle-changes-filter'),
+          },
+        ]
         : []),
       {
         label: __DARWIN__ ? 'Toggle Full Screen' : 'Toggle &full screen',
@@ -351,8 +351,8 @@ export function buildDefaultMenu({
         label: __DARWIN__
           ? 'Show in Finder'
           : __WIN32__
-          ? 'Show in E&xplorer'
-          : 'Show in your File Manager',
+            ? 'Show in E&xplorer'
+            : 'Show in your File Manager',
         id: 'open-working-directory',
         accelerator: 'CmdOrCtrl+Shift+F',
         click: emit('open-working-directory'),
@@ -364,6 +364,15 @@ export function buildDefaultMenu({
         id: 'open-external-editor',
         accelerator: 'CmdOrCtrl+Shift+A',
         click: emit('open-external-editor'),
+      },
+      {
+        label: __DARWIN__
+          ? `Open in ${selectedSecondaryExternalEditor ?? 'Secondary External Editor'}`
+          : `Open in ${selectedSecondaryExternalEditor ?? 'secondary external editor'}`,
+        id: 'open-secondary-external-editor',
+        accelerator: 'CmdOrCtrl+Alt+A',
+        click: emit('open-secondary-external-editor'),
+        enabled: selectedSecondaryExternalEditor !== null,
       },
       separator,
       {
@@ -545,8 +554,8 @@ export function buildDefaultMenu({
   const showLogsLabel = __DARWIN__
     ? 'Show Logs in Finder'
     : __WIN32__
-    ? 'S&how logs in Explorer'
-    : 'S&how logs in your File Manager'
+      ? 'S&how logs in Explorer'
+      : 'S&how logs in your File Manager'
 
   const showLogsItem: Electron.MenuItemConstructorOptions = {
     label: showLogsLabel,

@@ -8,6 +8,10 @@
 
 **IMPORTANT**:
 
+- FOCUS FOCUS FOCUS: Don't get carried away, we are here to add a secondary editor, not to fix or change random stuff, even it's broken, it won't work: this is a huge repo!
+
+**NAMING**:
+
 - It's CustomSecondaryEditor, NOT SecondaryCustomEditor
 - It's SecondaryExternalEditor, NOT ExternalSecondaryEditor
 
@@ -45,10 +49,10 @@ Some initial work has been done, primarily in `app-store.ts`, `app-state.ts`, an
         - Define the metric name `'suggestedStepOpenInSecondaryExternalEditor'`.
         - Ensure actions exist for saving secondary editor preferences (`setSecondaryExternalEditor`, `setUseCustomSecondaryEditor`, `setCustomSecondaryEditor`) (User reported done).
 
-5. **Keybinding (`app/src/main-process/menu/build-default-menu.ts`) (PENDING):**
-    - **`MenuLabelsEvent`**: Includes `selectedSecondaryExternalEditor`.
-    - **`buildDefaultMenu` function:** Ensure signature destructures it. Add menu item (label, accelerator `CmdOrCtrl+Shift+S`?, enabled state, click handler using `emit`).
-    - **IPC Handling:** Define menu event. Update `AppStore` listener to call `_openInSecondaryExternalEditor`.
+5. **Keybinding (`app/src/main-process/menu/build-default-menu.ts`) (DONE):**
+    - **`MenuLabelsEvent`**: Includes `selectedSecondaryExternalEditor` (DONE).
+    - **`buildDefaultMenu` function:** Signature destructures `selectedSecondaryExternalEditor`. Menu item "Open in Secondary External Editor" added with label, accelerator `CmdOrCtrl+Alt+A`, enabled state, and click handler using `emit('open-secondary-external-editor')` (DONE).
+    - **IPC Handling:** Define menu event. Update `AppStore` listener to call `_openInSecondaryExternalEditor`. (PENDING)
 
 **Key Files Revisited (with focus areas for secondary editor):**
 
@@ -56,7 +60,7 @@ Some initial work has been done, primarily in `app-store.ts`, `app-state.ts`, an
 - `app/src/ui/preferences/preferences.tsx`: (DONE)
 - `app/src/ui/preferences/integrations.tsx`: (DONE - UI Implementation)
 - `app/src/ui/changes/no-changes.tsx` (or other main UI view): (DONE - Button/Action)
-- `app/src/main-process/menu/build-default-menu.ts`: (PENDING - Menu Item/Shortcut)
+- `app/src/main-process/menu/build-default-menu.ts`: (DONE - Menu Item/Shortcut)
 - `app/src/ui/dispatcher/dispatcher.ts`: (User reports done - Actions)
 - `app/src/lib/app-state.ts`: (DONE)
 - `app/src/models/menu-labels.ts`: (DONE)
