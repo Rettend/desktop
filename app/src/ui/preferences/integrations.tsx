@@ -214,7 +214,6 @@ export class Integrations extends React.Component<
   }
 
   private setSelectedSecondaryEditor = (editor: string) => {
-    console.log('EDITOR - setSelectedSecondaryEditor', editor)
     if (editor === CustomIntegrationValue) {
       this.setState({ useCustomSecondaryEditor: true })
       this.props.onUseCustomSecondaryEditorChanged(true)

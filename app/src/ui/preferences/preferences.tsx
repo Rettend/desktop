@@ -678,7 +678,6 @@ export class Preferences extends React.Component<
   }
 
   private onSelectedSecondaryEditorChanged = (editor: string | null) => {
-    console.log('EDITOR - onSelectedSecondaryEditorChanged', editor)
     this.setState({ selectedSecondaryExternalEditor: editor })
   }
 
