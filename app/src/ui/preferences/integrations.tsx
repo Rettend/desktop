@@ -210,9 +210,6 @@ export class Integrations extends React.Component<
     event: React.FormEvent<HTMLSelectElement>
   ) => {
     const value = event.currentTarget.value
-    if (!value) {
-      return
-    }
     this.setSelectedSecondaryEditor(value)
   }
 
@@ -333,11 +330,10 @@ export class Integrations extends React.Component<
         value={
           useCustomSecondaryEditor
             ? CustomIntegrationValue
-            : selectedSecondaryExternalEditor ?? undefined
+            : selectedSecondaryExternalEditor ?? ''
         }
         onChange={this.onSelectedSecondaryEditorChanged}
       >
-        {/* Allow a "None" option */}
         <option key="none" value="">
           None
         </option>
