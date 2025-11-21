@@ -55,6 +55,8 @@ interface ISelectedCommitsProps {
   readonly externalEditorLabel?: string
   /** The name of the currently selected secondary external editor */
   readonly secondaryExternalEditorLabel?: string
+  /** The name of the currently selected third external editor */
+  readonly thirdExternalEditorLabel?: string
 
   /**
    * Called to open a file using the user's configured applications
@@ -68,6 +70,12 @@ interface ISelectedCommitsProps {
    * @param path The path of the file relative to the root of the repository
    */
   readonly onOpenInSecondaryExternalEditor: (path: string) => void
+  /**
+   * Called to open a file using the user's configured third external editor
+   *
+   * @param path The path of the file relative to the root of the repository
+   */
+  readonly onOpenInThirdExternalEditor: (path: string) => void
   readonly onViewCommitOnGitHub: (SHA: string, filePath?: string) => void
   readonly hideWhitespaceInDiff: boolean
 
@@ -388,7 +396,9 @@ export class SelectedCommits extends React.Component<
       repository,
       externalEditorLabel,
       secondaryExternalEditorLabel,
+      thirdExternalEditorLabel,
       onOpenInSecondaryExternalEditor,
+      onOpenInThirdExternalEditor,
     } = this.props
 
     const fullPath = Path.join(repository.path, file.path)
@@ -429,6 +439,14 @@ export class SelectedCommits extends React.Component<
       items.push({
         label: `Open in ${secondaryExternalEditorLabel}`,
         action: () => onOpenInSecondaryExternalEditor(file.path),
+        enabled: fileExistsOnDisk,
+      })
+    }
+
+    if (thirdExternalEditorLabel && onOpenInThirdExternalEditor) {
+      items.push({
+        label: `Open in ${thirdExternalEditorLabel}`,
+        action: () => onOpenInThirdExternalEditor(file.path),
         enabled: fileExistsOnDisk,
       })
     }

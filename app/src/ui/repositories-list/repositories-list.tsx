@@ -70,6 +70,12 @@ interface IRepositoriesListProps {
   /** The current secondary external editor selected by the user */
   readonly secondaryExternalEditorLabel?: string
 
+  /** Called when the repository should be opened in a third external editor */
+  readonly onOpenInThirdExternalEditor: (repository: Repositoryish) => void
+
+  /** The current third external editor selected by the user */
+  readonly thirdExternalEditorLabel?: string
+
   /** The label for the user's preferred shell. */
   readonly shellLabel?: string
 
@@ -131,10 +137,10 @@ export class RepositoriesList extends React.Component<
       repositories === null
         ? []
         : groupRepositories(
-            repositories,
-            localRepositoryStateLookup,
-            recentRepositories
-          )
+          repositories,
+          localRepositoryStateLookup,
+          recentRepositories
+        )
   )
 
   /**
@@ -227,6 +233,8 @@ export class RepositoriesList extends React.Component<
         this.props.askForConfirmationOnRemoveRepository,
       externalEditorLabel: this.props.externalEditorLabel,
       secondaryExternalEditorLabel: this.props.secondaryExternalEditorLabel,
+      thirdExternalEditorLabel: this.props.thirdExternalEditorLabel,
+      onOpenInThirdExternalEditor: this.props.onOpenInThirdExternalEditor,
       onChangeRepositoryAlias: this.onChangeRepositoryAlias,
       onRemoveRepositoryAlias: this.onRemoveRepositoryAlias,
       onViewOnGitHub: this.props.onViewOnGitHub,
@@ -244,8 +252,8 @@ export class RepositoriesList extends React.Component<
         IFilterListGroup<IRepositoryListItem, RepositoryListGroup>
       >
     ) =>
-    (group: number) =>
-      this.getGroupLabel(groups[group].identifier)
+      (group: number) =>
+        this.getGroupLabel(groups[group].identifier)
 
   public render() {
     const groups = this.getRepositoryGroups(

@@ -6,6 +6,7 @@ import {
   RevealInFileManagerLabel,
   DefaultEditorLabel,
   DefaultSecondaryEditorLabel,
+  DefaultThirdEditorLabel,
   DefaultShellLabel,
 } from '../lib/context-menu'
 
@@ -14,12 +15,14 @@ interface IRepositoryListItemContextMenuConfig {
   shellLabel: string | undefined
   externalEditorLabel: string | undefined
   secondaryExternalEditorLabel: string | undefined
+  thirdExternalEditorLabel: string | undefined
   askForConfirmationOnRemoveRepository: boolean
   onViewOnGitHub: (repository: Repositoryish) => void
   onOpenInShell: (repository: Repositoryish) => void
   onShowRepository: (repository: Repositoryish) => void
   onOpenInExternalEditor: (repository: Repositoryish) => void
   onOpenInSecondaryExternalEditor: (repository: Repositoryish) => void
+  onOpenInThirdExternalEditor: (repository: Repositoryish) => void
   onRemoveRepository: (repository: Repositoryish) => void
   onChangeRepositoryAlias: (repository: Repository) => void
   onRemoveRepositoryAlias: (repository: Repository) => void
@@ -38,6 +41,9 @@ export const generateRepositoryListContextMenu = (
   const openInSecondaryExternalEditor = config.secondaryExternalEditorLabel
     ? `Open in ${config.secondaryExternalEditorLabel}`
     : DefaultSecondaryEditorLabel
+  const openInThirdExternalEditor = config.thirdExternalEditorLabel
+    ? `Open in ${config.thirdExternalEditorLabel}`
+    : DefaultThirdEditorLabel
   const openInShell = config.shellLabel
     ? `Open in ${config.shellLabel}`
     : DefaultShellLabel
@@ -76,6 +82,11 @@ export const generateRepositoryListContextMenu = (
     {
       label: openInSecondaryExternalEditor,
       action: () => config.onOpenInSecondaryExternalEditor(repository),
+      enabled: !missing,
+    },
+    {
+      label: openInThirdExternalEditor,
+      action: () => config.onOpenInThirdExternalEditor(repository),
       enabled: !missing,
     },
     { type: 'separator' },

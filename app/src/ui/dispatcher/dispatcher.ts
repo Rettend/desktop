@@ -1480,6 +1480,13 @@ export class Dispatcher {
   }
 
   /**
+   * Opens a path in the third external editor selected by the user.
+   */
+  public async openInThirdExternalEditor(fullPath: string): Promise<void> {
+    return this.appStore._openInThirdExternalEditor(fullPath)
+  }
+
+  /**
    * Persist the given content to the repository's root .gitignore.
    *
    * If the repository root doesn't contain a .gitignore file one
@@ -2009,6 +2016,10 @@ export class Dispatcher {
 
   public setSecondaryExternalEditor(editor: string | null): Promise<void> {
     return this.appStore._setSecondaryExternalEditor(editor)
+  }
+
+  public setThirdExternalEditor(editor: string | null): Promise<void> {
+    return this.appStore._setThirdExternalEditor(editor)
   }
 
   /**
@@ -3272,6 +3283,16 @@ export class Dispatcher {
   /** Set the custom secondary external editor info */
   public setCustomSecondaryEditor(customSecondaryEditor: ICustomIntegration) {
     this.appStore._setCustomSecondaryEditor(customSecondaryEditor)
+  }
+
+  /** Set whether or not the user wants to use a custom third external editor */
+  public setUseCustomThirdEditor(useCustomThirdEditor: boolean) {
+    this.appStore._setUseCustomThirdEditor(useCustomThirdEditor)
+  }
+
+  /** Set the custom third external editor info */
+  public setCustomThirdEditor(customThirdEditor: ICustomIntegration) {
+    this.appStore._setCustomThirdEditor(customThirdEditor)
   }
 
   /** Set whether or not the user wants to use a custom shell */

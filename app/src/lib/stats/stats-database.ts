@@ -234,6 +234,12 @@ export interface IDailyMeasures {
   readonly suggestedStepOpenInSecondaryExternalEditor: number
 
   /**
+   * The number of times the user has opened their third external editor from the
+   * suggested next steps view
+   */
+  readonly suggestedStepOpenInThirdExternalEditor: number
+
+  /**
    * The number of times the user has opened their repository in Finder/Explorer
    * from the suggested next steps view
    */

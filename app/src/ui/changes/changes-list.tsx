@@ -23,6 +23,7 @@ import { Checkbox, CheckboxValue } from '../lib/checkbox'
 import {
   isSafeFileExtension,
   DefaultEditorLabel,
+  DefaultThirdEditorLabel,
   CopyFilePathLabel,
   RevealInFileManagerLabel,
   OpenWithDefaultProgramLabel,
@@ -66,13 +67,13 @@ const StashIcon: OcticonSymbolVariant = {
   h: 16,
   p: [
     'M10.5 1.286h-9a.214.214 0 0 0-.214.214v9a.214.214 0 0 0 .214.214h9a.214.214 0 0 0 ' +
-      '.214-.214v-9a.214.214 0 0 0-.214-.214zM1.5 0h9A1.5 1.5 0 0 1 12 1.5v9a1.5 1.5 0 0 1-1.5 ' +
-      '1.5h-9A1.5 1.5 0 0 1 0 10.5v-9A1.5 1.5 0 0 1 1.5 0zm5.712 7.212a1.714 1.714 0 1 ' +
-      '1-2.424-2.424 1.714 1.714 0 0 1 2.424 2.424zM2.015 12.71c.102.729.728 1.29 1.485 ' +
-      '1.29h9a1.5 1.5 0 0 0 1.5-1.5v-9a1.5 1.5 0 0 0-1.29-1.485v1.442a.216.216 0 0 1 ' +
-      '.004.043v9a.214.214 0 0 1-.214.214h-9a.216.216 0 0 1-.043-.004H2.015zm2 2c.102.729.728 ' +
-      '1.29 1.485 1.29h9a1.5 1.5 0 0 0 1.5-1.5v-9a1.5 1.5 0 0 0-1.29-1.485v1.442a.216.216 0 0 1 ' +
-      '.004.043v9a.214.214 0 0 1-.214.214h-9a.216.216 0 0 1-.043-.004H4.015z',
+    '.214-.214v-9a.214.214 0 0 0-.214-.214zM1.5 0h9A1.5 1.5 0 0 1 12 1.5v9a1.5 1.5 0 0 1-1.5 ' +
+    '1.5h-9A1.5 1.5 0 0 1 0 10.5v-9A1.5 1.5 0 0 1 1.5 0zm5.712 7.212a1.714 1.714 0 1 ' +
+    '1-2.424-2.424 1.714 1.714 0 0 1 2.424 2.424zM2.015 12.71c.102.729.728 1.29 1.485 ' +
+    '1.29h9a1.5 1.5 0 0 0 1.5-1.5v-9a1.5 1.5 0 0 0-1.29-1.485v1.442a.216.216 0 0 1 ' +
+    '.004.043v9a.214.214 0 0 1-.214.214h-9a.216.216 0 0 1-.043-.004H2.015zm2 2c.102.729.728 ' +
+    '1.29 1.485 1.29h9a1.5 1.5 0 0 0 1.5-1.5v-9a1.5 1.5 0 0 0-1.29-1.485v1.442a.216.216 0 0 1 ' +
+    '.004.043v9a.214.214 0 0 1-.214.214h-9a.216.216 0 0 1-.043-.004H4.015z',
   ],
 }
 
@@ -174,6 +175,13 @@ interface IChangesListProps {
   readonly onOpenItemInSecondaryExternalEditor: (path: string) => void
 
   /**
+   * Called to open a file in the third external editor
+   *
+   * @param path The path of the file relative to the root of the repository
+   */
+  readonly onOpenItemInThirdExternalEditor: (path: string) => void
+
+  /**
    * The currently checked out branch (null if no branch is checked out).
    */
   readonly branch: string | null
@@ -224,6 +232,9 @@ interface IChangesListProps {
 
   /** The name of the currently selected secondary external editor */
   readonly secondaryExternalEditorLabel?: string
+
+  /** The name of the currently selected third external editor */
+  readonly thirdExternalEditorLabel?: string
 
   readonly stashEntry: IStashEntry | null
 
@@ -325,14 +336,14 @@ export class ChangesList extends React.Component<
       selection === DiffSelectionType.All
         ? true
         : selection === DiffSelectionType.None
-        ? false
-        : null
+          ? false
+          : null
 
     const include = isUncommittableSubmodule
       ? false
       : rebaseConflictState !== null
-      ? file.status.kind !== AppFileStatusKind.Untracked
-      : includeAll
+        ? file.status.kind !== AppFileStatusKind.Untracked
+        : includeAll
 
     const disableSelection =
       isCommitting || rebaseConflictState !== null || isUncommittableSubmodule
@@ -340,8 +351,8 @@ export class ChangesList extends React.Component<
     const checkboxTooltip = isUncommittableSubmodule
       ? 'This submodule change cannot be added to a commit in this repository because it contains changes that have not been committed.'
       : isPartiallyCommittableSubmodule
-      ? 'Only changes that have been committed within the submodule will be added to this repository. You need to commit any other modified or untracked changes in the submodule before including them in this repository.'
-      : undefined
+        ? 'Only changes that have been committed within the submodule will be added to this repository. You need to commit any other modified or untracked changes in the submodule before including them in this repository.'
+        : undefined
 
     return (
       <ChangedFile
@@ -409,8 +420,8 @@ export class ChangesList extends React.Component<
           ? `Discard Changes`
           : `Discard changes`
         : __DARWIN__
-        ? `Discard ${files.length} Selected Changes`
-        : `Discard ${files.length} selected changes`
+          ? `Discard ${files.length} Selected Changes`
+          : `Discard ${files.length} selected changes`
 
     return this.props.askForConfirmationOnDiscardChanges ? `${label}…` : label
   }
@@ -556,6 +567,25 @@ export class ChangesList extends React.Component<
     }
   }
 
+  private getOpenInThirdExternalEditorMenuItem = (
+    file: WorkingDirectoryFileChange,
+    enabled: boolean
+  ): IMenuItem => {
+    const { thirdExternalEditorLabel } = this.props
+
+    const openInThirdExternalEditor = thirdExternalEditorLabel
+      ? `Open in ${thirdExternalEditorLabel}`
+      : DefaultThirdEditorLabel
+
+    return {
+      label: openInThirdExternalEditor,
+      action: () => {
+        this.props.onOpenItemInThirdExternalEditor(file.path)
+      },
+      enabled,
+    }
+  }
+
   private getDefaultContextMenu(
     file: WorkingDirectoryFileChange
   ): ReadonlyArray<IMenuItem> {
@@ -695,6 +725,7 @@ export class ChangesList extends React.Component<
       this.getRevealInFileManagerMenuItem(file),
       this.getOpenInExternalEditorMenuItem(file, enabled),
       this.getOpenInSecondaryExternalEditorMenuItem(file, enabled),
+      this.getOpenInThirdExternalEditorMenuItem(file, enabled),
       {
         label: OpenWithDefaultProgramLabel,
         action: () => this.props.onOpenItem(path),
@@ -730,6 +761,7 @@ export class ChangesList extends React.Component<
       this.getRevealInFileManagerMenuItem(file),
       this.getOpenInExternalEditorMenuItem(file, enabled),
       this.getOpenInSecondaryExternalEditorMenuItem(file, enabled),
+      this.getOpenInThirdExternalEditorMenuItem(file, enabled),
       {
         label: OpenWithDefaultProgramLabel,
         action: () => this.props.onOpenItem(path),
@@ -943,13 +975,13 @@ export class ChangesList extends React.Component<
 
     return mustOverrideExistingMessage
       ? this.props.dispatcher.promptOverrideWithGeneratedCommitMessage(
-          this.props.repository,
-          filesSelected
-        )
+        this.props.repository,
+        filesSelected
+      )
       : this.props.dispatcher.generateCommitMessage(
-          this.props.repository,
-          filesSelected
-        )
+        this.props.repository,
+        filesSelected
+      )
   }
 
   private onShowPopup = (p: Popup) => this.props.dispatcher.showPopup(p)

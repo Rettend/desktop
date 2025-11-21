@@ -34,6 +34,14 @@ interface IIntegrationsPreferencesProps {
   readonly onCustomSecondaryEditorChanged: (
     customSecondaryEditor: ICustomIntegration
   ) => void
+  readonly selectedThirdExternalEditor: string | null
+  readonly useCustomThirdEditor: boolean
+  readonly customThirdEditor: ICustomIntegration | null
+  readonly onSelectedThirdEditorChanged: (editor: string | null) => void
+  readonly onUseCustomThirdEditorChanged: (useCustomThirdEditor: boolean) => void
+  readonly onCustomThirdEditorChanged: (
+    customThirdEditor: ICustomIntegration
+  ) => void
   readonly onUseCustomShellChanged: (useCustomShell: boolean) => void
   readonly onCustomShellChanged: (customShell: ICustomIntegration) => void
 }
@@ -46,6 +54,9 @@ interface IIntegrationsPreferencesState {
   readonly useCustomSecondaryEditor: boolean
   readonly customEditor: ICustomIntegration
   readonly customSecondaryEditor: ICustomIntegration
+  readonly selectedThirdExternalEditor: string | null
+  readonly useCustomThirdEditor: boolean
+  readonly customThirdEditor: ICustomIntegration
   readonly useCustomShell: boolean
   readonly customShell: ICustomIntegration
 }
@@ -57,6 +68,7 @@ export class Integrations extends React.Component<
   private customEditorFormRef = React.createRef<CustomIntegrationForm>()
   private customSecondaryEditorFormRef =
     React.createRef<CustomIntegrationForm>()
+  private customThirdEditorFormRef = React.createRef<CustomIntegrationForm>()
   private customShellFormRef = React.createRef<CustomIntegrationForm>()
 
   public constructor(props: IIntegrationsPreferencesProps) {
@@ -71,6 +83,12 @@ export class Integrations extends React.Component<
       useCustomSecondaryEditor: this.props.useCustomSecondaryEditor,
       customEditor: this.props.customEditor,
       customSecondaryEditor: this.props.customSecondaryEditor ?? {
+        path: '',
+        arguments: '',
+      },
+      selectedThirdExternalEditor: this.props.selectedThirdExternalEditor,
+      useCustomThirdEditor: this.props.useCustomThirdEditor,
+      customThirdEditor: this.props.customThirdEditor ?? {
         path: '',
         arguments: '',
       },
@@ -110,6 +128,17 @@ export class Integrations extends React.Component<
       }
     }
 
+    let selectedThirdExternalEditor = nextProps.selectedThirdExternalEditor
+    if (editors.length) {
+      const indexOf = selectedThirdExternalEditor
+        ? editors.indexOf(selectedThirdExternalEditor)
+        : -1
+      if (indexOf === -1 && selectedThirdExternalEditor !== null) {
+        selectedThirdExternalEditor = editors[0]
+        nextProps.onSelectedThirdEditorChanged(selectedThirdExternalEditor)
+      }
+    }
+
     const shells = nextProps.availableShells
     let selectedShell = nextProps.selectedShell
     if (shells.length) {
@@ -119,6 +148,7 @@ export class Integrations extends React.Component<
         nextProps.onSelectedShellChanged(selectedShell)
       }
     }
+
     this.setState({
       selectedExternalEditor,
       selectedSecondaryExternalEditor,
@@ -127,6 +157,12 @@ export class Integrations extends React.Component<
       customEditor: nextProps.customEditor,
       useCustomSecondaryEditor: nextProps.useCustomSecondaryEditor,
       customSecondaryEditor: nextProps.customSecondaryEditor ?? {
+        path: '',
+        arguments: '',
+      },
+      selectedThirdExternalEditor,
+      useCustomThirdEditor: nextProps.useCustomThirdEditor,
+      customThirdEditor: nextProps.customThirdEditor ?? {
         path: '',
         arguments: '',
       },
@@ -174,6 +210,10 @@ export class Integrations extends React.Component<
       this.state.useCustomSecondaryEditor
     ) {
       this.customSecondaryEditorFormRef.current?.focus()
+    }
+
+    if (!prevState.useCustomThirdEditor && this.state.useCustomThirdEditor) {
+      this.customThirdEditorFormRef.current?.focus()
     }
 
     if (!prevState.useCustomShell && this.state.useCustomShell) {
@@ -231,6 +271,34 @@ export class Integrations extends React.Component<
       })
       this.props.onUseCustomSecondaryEditorChanged(false)
       this.props.onSelectedSecondaryEditorChanged(editor)
+    }
+  }
+
+  private onSelectedThirdEditorChanged = (
+    event: React.FormEvent<HTMLSelectElement>
+  ) => {
+    const value = event.currentTarget.value
+    this.setSelectedThirdEditor(value)
+  }
+
+  private setSelectedThirdEditor = (editor: string) => {
+    if (editor === CustomIntegrationValue) {
+      this.setState({ useCustomThirdEditor: true })
+      this.props.onUseCustomThirdEditorChanged(true)
+    } else if (editor === '') {
+      this.setState({
+        useCustomThirdEditor: false,
+        selectedThirdExternalEditor: null,
+      })
+      this.props.onUseCustomThirdEditorChanged(false)
+      this.props.onSelectedThirdEditorChanged(null)
+    } else {
+      this.setState({
+        useCustomThirdEditor: false,
+        selectedThirdExternalEditor: editor,
+      })
+      this.props.onUseCustomThirdEditorChanged(false)
+      this.props.onSelectedThirdEditorChanged(editor)
     }
   }
 
@@ -402,6 +470,56 @@ export class Integrations extends React.Component<
     )
   }
 
+  private renderThirdExternalEditor() {
+    const options = this.props.availableEditors
+    const { selectedThirdExternalEditor, useCustomThirdEditor } = this.state
+    const label = __DARWIN__ ? 'Third External Editor' : 'Third external editor'
+
+    return (
+      <Select
+        label={enableCustomIntegration() ? undefined : label}
+        aria-label="Third external editor"
+        value={
+          useCustomThirdEditor
+            ? CustomIntegrationValue
+            : selectedThirdExternalEditor ?? ''
+        }
+        onChange={this.onSelectedThirdEditorChanged}
+      >
+        <option key="none" value="">
+          None
+        </option>
+        {options.map(n => (
+          <option key={n} value={n}>
+            {n}
+          </option>
+        ))}
+        {enableCustomIntegration() && (
+          <option key={CustomIntegrationValue} value={CustomIntegrationValue}>
+            {__DARWIN__
+              ? 'Configure Custom Third Editor…'
+              : 'Configure custom third editor…'}
+          </option>
+        )}
+      </Select>
+    )
+  }
+
+  private renderCustomThirdExternalEditor() {
+    return (
+      <Row>
+        <CustomIntegrationForm
+          id="custom-third-editor"
+          ref={this.customThirdEditorFormRef}
+          path={this.state.customThirdEditor.path ?? ''}
+          arguments={this.state.customThirdEditor.arguments}
+          onPathChanged={this.onCustomThirdEditorPathChanged}
+          onArgumentsChanged={this.onCustomThirdEditorArgumentsChanged}
+        />
+      </Row>
+    )
+  }
+
   private onCustomEditorPathChanged = (path: string, bundleID?: string) => {
     const customEditor: ICustomIntegration = {
       path,
@@ -422,6 +540,31 @@ export class Integrations extends React.Component<
 
     this.setState({ customEditor })
     this.props.onCustomEditorChanged(customEditor)
+  }
+
+  private onCustomThirdEditorPathChanged = (
+    path: string,
+    bundleID?: string
+  ) => {
+    const customThirdEditor: ICustomIntegration = {
+      path,
+      bundleID,
+      arguments: this.state.customThirdEditor.arguments ?? [],
+    }
+
+    this.setState({ customThirdEditor })
+    this.props.onCustomThirdEditorChanged(customThirdEditor)
+  }
+
+  private onCustomThirdEditorArgumentsChanged = (args: string) => {
+    const customThirdEditor: ICustomIntegration = {
+      path: this.state.customThirdEditor.path,
+      bundleID: this.state.customThirdEditor.bundleID,
+      arguments: args,
+    }
+
+    this.setState({ customThirdEditor })
+    this.props.onCustomThirdEditorChanged(customThirdEditor)
   }
 
   private onCustomSecondaryEditorPathChanged = (
@@ -518,6 +661,7 @@ export class Integrations extends React.Component<
           <h2>Applications</h2>
           <Row>{this.renderExternalEditor()}</Row>
           <Row>{this.renderSecondaryExternalEditor()}</Row>
+          <Row>{this.renderThirdExternalEditor()}</Row>
           <Row>{this.renderSelectedShell()}</Row>
         </DialogContent>
       )
@@ -544,6 +688,16 @@ export class Integrations extends React.Component<
           <Row>{this.renderSecondaryExternalEditor()}</Row>
           {this.state.useCustomSecondaryEditor &&
             this.renderCustomSecondaryExternalEditor()}
+        </fieldset>
+        <fieldset>
+          <legend>
+            <h2>
+              {__DARWIN__ ? 'Third External Editor' : 'Third external editor'}
+            </h2>
+          </legend>
+          <Row>{this.renderThirdExternalEditor()}</Row>
+          {this.state.useCustomThirdEditor &&
+            this.renderCustomThirdExternalEditor()}
         </fieldset>
         <fieldset>
           <legend>

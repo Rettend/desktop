@@ -77,6 +77,9 @@ interface IPreferencesProps {
   readonly customEditor: ICustomIntegration | null
   readonly useCustomSecondaryEditor: boolean
   readonly customSecondaryEditor: ICustomIntegration | null
+  readonly selectedThirdExternalEditor: string | null
+  readonly useCustomThirdEditor: boolean
+  readonly customThirdEditor: ICustomIntegration | null
   readonly useCustomShell: boolean
   readonly customShell: ICustomIntegration | null
   readonly repositoryIndicatorsEnabled: boolean
@@ -113,6 +116,9 @@ interface IPreferencesState {
   readonly customEditor: ICustomIntegration
   readonly useCustomSecondaryEditor: boolean
   readonly customSecondaryEditor: ICustomIntegration
+  readonly selectedThirdExternalEditor: string | null
+  readonly useCustomThirdEditor: boolean
+  readonly customThirdEditor: ICustomIntegration
   readonly useCustomShell: boolean
   readonly customShell: ICustomIntegration
   readonly selectedExternalEditor: string | null
@@ -173,6 +179,9 @@ export class Preferences extends React.Component<
       useCustomSecondaryEditor: this.props.useCustomSecondaryEditor,
       customSecondaryEditor:
         this.props.customSecondaryEditor ?? DefaultCustomIntegration,
+      selectedThirdExternalEditor: this.props.selectedThirdExternalEditor,
+      useCustomThirdEditor: this.props.useCustomThirdEditor,
+      customThirdEditor: this.props.customThirdEditor ?? DefaultCustomIntegration,
       useCustomShell: this.props.useCustomShell,
       customShell: this.props.customShell ?? DefaultCustomIntegration,
       useWindowsOpenSSH: false,
@@ -267,6 +276,9 @@ export class Preferences extends React.Component<
       useCustomSecondaryEditor: this.props.useCustomSecondaryEditor,
       customSecondaryEditor:
         this.props.customSecondaryEditor ?? DefaultCustomIntegration,
+      selectedThirdExternalEditor: this.props.selectedThirdExternalEditor,
+      useCustomThirdEditor: this.props.useCustomThirdEditor,
+      customThirdEditor: this.props.customThirdEditor ?? DefaultCustomIntegration,
       useCustomShell: this.props.useCustomShell,
       customShell: this.props.customShell ?? DefaultCustomIntegration,
       selectedExternalEditor: this.props.selectedExternalEditor,
@@ -433,6 +445,12 @@ export class Preferences extends React.Component<
             customEditor={this.state.customEditor}
             useCustomSecondaryEditor={this.state.useCustomSecondaryEditor}
             customSecondaryEditor={this.state.customSecondaryEditor}
+            selectedThirdExternalEditor={this.state.selectedThirdExternalEditor}
+            useCustomThirdEditor={this.state.useCustomThirdEditor}
+            customThirdEditor={this.state.customThirdEditor}
+            onSelectedThirdEditorChanged={this.onSelectedThirdEditorChanged}
+            onUseCustomThirdEditorChanged={this.onUseCustomThirdEditorChanged}
+            onCustomThirdEditorChanged={this.onCustomThirdEditorChanged}
             useCustomShell={this.state.useCustomShell}
             customShell={this.state.customShell}
             onSelectedShellChanged={this.onSelectedShellChanged}
@@ -681,6 +699,20 @@ export class Preferences extends React.Component<
     this.setState({ selectedSecondaryExternalEditor: editor })
   }
 
+  private onSelectedThirdEditorChanged = (editor: string | null) => {
+    this.setState({ selectedThirdExternalEditor: editor })
+  }
+
+  private onUseCustomThirdEditorChanged = (useCustomThirdEditor: boolean) => {
+    this.setState({ useCustomThirdEditor })
+  }
+
+  private onCustomThirdEditorChanged = (
+    customThirdEditor: ICustomIntegration
+  ) => {
+    this.setState({ customThirdEditor })
+  }
+
   private onSelectedShellChanged = (shell: Shell) => {
     this.setState({ selectedShell: shell })
   }
@@ -801,6 +833,8 @@ export class Preferences extends React.Component<
       customEditor,
       useCustomSecondaryEditor,
       customSecondaryEditor,
+      useCustomThirdEditor,
+      customThirdEditor,
       useCustomShell,
       customShell,
     } = this.state
@@ -820,6 +854,15 @@ export class Preferences extends React.Component<
     )
     if (isValidCustomSecondaryEditor) {
       dispatcher.setCustomSecondaryEditor(customSecondaryEditor)
+    }
+
+    const isValidCustomThirdEditor =
+      customThirdEditor && (await isValidCustomIntegration(customThirdEditor))
+    dispatcher.setUseCustomThirdEditor(
+      useCustomThirdEditor && isValidCustomThirdEditor
+    )
+    if (isValidCustomThirdEditor) {
+      dispatcher.setCustomThirdEditor(customThirdEditor)
     }
 
     const isValidCustomShell =
@@ -862,6 +905,9 @@ export class Preferences extends React.Component<
     }
     await dispatcher.setSecondaryExternalEditor(
       this.state.selectedSecondaryExternalEditor
+    )
+    await dispatcher.setThirdExternalEditor(
+      this.state.selectedThirdExternalEditor
     )
     await dispatcher.setShell(this.state.selectedShell)
     await dispatcher.setConfirmDiscardChangesSetting(

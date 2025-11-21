@@ -86,11 +86,19 @@ interface IRepositoryViewProps {
    */
   readonly isSecondaryExternalEditorAvailable: boolean
 
+  /**
+   * Whether or not the user has a configured third external editor.
+   */
+  readonly isThirdExternalEditorAvailable: boolean
+
   /** The name of the currently selected external editor */
   readonly externalEditorLabel?: string
 
   /** The name of the currently selected secondary external editor */
   readonly secondaryExternalEditorLabel?: string
+
+  /** The name of the currently selected third external editor */
+  readonly thirdExternalEditorLabel?: string
 
   /** A cached entry representing an external editor found on the user's machine */
   readonly resolvedExternalEditor: string | null
@@ -109,6 +117,13 @@ interface IRepositoryViewProps {
    * @param fullPath The full path to the file on disk
    */
   readonly onOpenInSecondaryExternalEditor: (fullPath: string) => void
+
+  /**
+   * Callback to open a selected file using the configured third external editor
+   *
+   * @param fullPath The full path to the file on disk
+   */
+  readonly onOpenInThirdExternalEditor: (fullPath: string) => void
 
   /**
    * The top-level application menu item.
@@ -285,6 +300,8 @@ export class RepositoryView extends React.Component<
         secondaryExternalEditorLabel={this.props.secondaryExternalEditorLabel}
         onOpenInExternalEditor={this.props.onOpenInExternalEditor}
         onOpenInSecondaryExternalEditor={this.props.onOpenInSecondaryExternalEditor}
+        onOpenInThirdExternalEditor={this.props.onOpenInThirdExternalEditor}
+        thirdExternalEditorLabel={this.props.thirdExternalEditorLabel}
         onChangesListScrolled={this.onChangesListScrolled}
         changesListScrollTop={scrollTop}
         shouldNudgeToCommit={
@@ -315,7 +332,7 @@ export class RepositoryView extends React.Component<
     const currentBranch = tip.kind === TipState.Valid ? tip.branch : null
     const scrollTop =
       this.forceCompareListScrollTop ||
-      this.previousSection === RepositorySectionTab.Changes
+        this.previousSection === RepositorySectionTab.Changes
         ? this.state.compareListScrollTop
         : undefined
     this.previousSection = RepositorySectionTab.History
@@ -478,6 +495,8 @@ export class RepositoryView extends React.Component<
         secondaryExternalEditorLabel={this.props.secondaryExternalEditorLabel}
         onOpenInExternalEditor={this.props.onOpenInExternalEditor}
         onOpenInSecondaryExternalEditor={this.props.onOpenInSecondaryExternalEditor}
+        onOpenInThirdExternalEditor={this.props.onOpenInThirdExternalEditor}
+        thirdExternalEditorLabel={this.props.thirdExternalEditorLabel}
         onViewCommitOnGitHub={this.props.onViewCommitOnGitHub}
         hideWhitespaceInDiff={this.props.hideWhitespaceInHistoryDiff}
         showSideBySideDiff={this.props.showSideBySideDiff}
@@ -548,6 +567,7 @@ export class RepositoryView extends React.Component<
             repositoryState={this.props.state}
             isExternalEditorAvailable={this.props.isExternalEditorAvailable}
             isSecondaryExternalEditorAvailable={this.props.isSecondaryExternalEditorAvailable}
+            isThirdExternalEditorAvailable={this.props.isThirdExternalEditorAvailable}
             dispatcher={this.props.dispatcher}
             pullRequestSuggestedNextAction={
               this.props.pullRequestSuggestedNextAction

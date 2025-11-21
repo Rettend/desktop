@@ -39,6 +39,7 @@ export const separator: Electron.MenuItemConstructorOptions = {
 export function buildDefaultMenu({
   selectedExternalEditor,
   selectedSecondaryExternalEditor,
+  selectedThirdExternalEditor,
   selectedShell,
   askForConfirmationOnForcePush,
   askForConfirmationOnRepositoryRemoval,
@@ -373,6 +374,15 @@ export function buildDefaultMenu({
         accelerator: 'CmdOrCtrl+Shift+X',
         click: emit('open-secondary-external-editor'),
         enabled: selectedSecondaryExternalEditor !== null,
+      },
+      {
+        label: __DARWIN__
+          ? `Open in ${selectedThirdExternalEditor ?? 'Third External Editor'}`
+          : `Open in ${selectedThirdExternalEditor ?? 'third external editor'}`,
+        id: 'open-third-external-editor',
+        accelerator: 'CmdOrCtrl+Shift+Z',
+        click: emit('open-third-external-editor'),
+        enabled: selectedThirdExternalEditor !== null,
       },
       separator,
       {

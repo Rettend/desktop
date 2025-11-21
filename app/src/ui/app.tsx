@@ -520,6 +520,8 @@ export class App extends React.Component<IAppProps, IAppState> {
         return this.openCurrentRepositoryInExternalEditor()
       case 'open-secondary-external-editor':
         return this.openCurrentRepositoryInSecondaryExternalEditor()
+      case 'open-third-external-editor':
+        return this.openCurrentRepositoryInThirdExternalEditor()
       case 'select-all':
         return this.selectAll()
       case 'show-stashed-changes':
@@ -725,6 +727,33 @@ export class App extends React.Component<IAppProps, IAppState> {
     }
 
     this.showRepository(state.repository)
+  }
+
+  private openCurrentRepositoryInExternalEditor() {
+    const state = this.state.selectedState
+    if (state == null || state.type !== SelectionType.Repository) {
+      return
+    }
+
+    this.props.dispatcher.openInExternalEditor(state.repository.path)
+  }
+
+  private openCurrentRepositoryInSecondaryExternalEditor() {
+    const state = this.state.selectedState
+    if (state == null || state.type !== SelectionType.Repository) {
+      return
+    }
+
+    this.props.dispatcher.openInSecondaryExternalEditor(state.repository.path)
+  }
+
+  private openCurrentRepositoryInThirdExternalEditor() {
+    const state = this.state.selectedState
+    if (state == null || state.type !== SelectionType.Repository) {
+      return
+    }
+
+    this.props.dispatcher.openInThirdExternalEditor(state.repository.path)
   }
 
   private renameBranch() {
@@ -1311,24 +1340,6 @@ export class App extends React.Component<IAppProps, IAppState> {
     this.openInShell(repository)
   }
 
-  private openCurrentRepositoryInExternalEditor() {
-    const repository = this.getRepository()
-    if (!repository) {
-      return
-    }
-
-    this.openInExternalEditor(repository)
-  }
-
-  private openCurrentRepositoryInSecondaryExternalEditor() {
-    const repository = this.getRepository()
-    if (!repository) {
-      return
-    }
-
-    this.openInSecondaryExternalEditor(repository)
-  }
-
   /**
    * Conditionally renders a menu bar. The menu bar is currently only rendered
    * on Windows.
@@ -1599,6 +1610,9 @@ export class App extends React.Component<IAppProps, IAppState> {
             useCustomSecondaryEditor={this.state.useCustomSecondaryEditor}
             customEditor={this.state.customEditor}
             customSecondaryEditor={this.state.customSecondaryEditor}
+            selectedThirdExternalEditor={this.state.selectedThirdExternalEditor}
+            useCustomThirdEditor={this.state.useCustomThirdEditor}
+            customThirdEditor={this.state.customThirdEditor}
             useCustomShell={this.state.useCustomShell}
             customShell={this.state.customShell}
             repositoryIndicatorsEnabled={this.state.repositoryIndicatorsEnabled}
@@ -2084,7 +2098,7 @@ export class App extends React.Component<IAppProps, IAppState> {
 
         const existingStash =
           selectedState !== null &&
-          selectedState.type === SelectionType.Repository
+            selectedState.type === SelectionType.Repository
             ? selectedState.state.changesState.stashEntry
             : null
 
@@ -2898,6 +2912,7 @@ export class App extends React.Component<IAppProps, IAppState> {
         onShowRepository={this.showRepository}
         onOpenInExternalEditor={this.openInExternalEditor}
         onOpenInSecondaryExternalEditor={this.openInSecondaryExternalEditor}
+        onOpenInThirdExternalEditor={this.openInThirdExternalEditor}
         externalEditorLabel={externalEditorLabel}
         secondaryExternalEditorLabel={secondaryExternalEditorLabel}
         shellLabel={useCustomShell ? undefined : selectedShell}
@@ -2952,6 +2967,16 @@ export class App extends React.Component<IAppProps, IAppState> {
     this.props.dispatcher.openInSecondaryExternalEditor(repository.path)
   }
 
+  private openInThirdExternalEditor = (
+    repository: Repository | CloningRepository
+  ) => {
+    if (!(repository instanceof Repository)) {
+      return
+    }
+
+    this.props.dispatcher.openInThirdExternalEditor(repository.path)
+  }
+
   private onOpenInExternalEditor = (path: string) => {
     const repository = this.state.selectedState?.repository
     if (repository === undefined) {
@@ -2970,6 +2995,16 @@ export class App extends React.Component<IAppProps, IAppState> {
 
     const fullPath = Path.join(repository.path, path)
     this.props.dispatcher.openInSecondaryExternalEditor(fullPath)
+  }
+
+  private onOpenInThirdExternalEditor = (path: string) => {
+    const repository = this.state.selectedState?.repository
+    if (repository === undefined) {
+      return
+    }
+
+    const fullPath = Path.join(repository.path, path)
+    this.props.dispatcher.openInThirdExternalEditor(fullPath)
   }
 
   private showRepository = (repository: Repository | CloningRepository) => {
@@ -3101,6 +3136,8 @@ export class App extends React.Component<IAppProps, IAppState> {
       shellLabel: this.state.useCustomShell
         ? undefined
         : this.state.selectedShell,
+      thirdExternalEditorLabel: this.state.selectedThirdExternalEditor ?? undefined,
+      onOpenInThirdExternalEditor: this.openInThirdExternalEditor,
     })
 
     showContextualMenu(items)
@@ -3421,6 +3458,10 @@ export class App extends React.Component<IAppProps, IAppState> {
         ? undefined
         : state.selectedSecondaryExternalEditor ?? undefined
 
+      const thirdExternalEditorLabel = state.useCustomThirdEditor
+        ? undefined
+        : state.selectedThirdExternalEditor ?? undefined
+
       return (
         <RepositoryView
           ref={this.repositoryViewRef}
@@ -3468,6 +3509,12 @@ export class App extends React.Component<IAppProps, IAppState> {
           resolvedExternalEditor={state.resolvedExternalEditor}
           onOpenInExternalEditor={this.onOpenInExternalEditor}
           onOpenInSecondaryExternalEditor={this.onOpenInSecondaryExternalEditor}
+          onOpenInThirdExternalEditor={this.onOpenInThirdExternalEditor}
+          isThirdExternalEditorAvailable={
+            state.useCustomThirdEditor ||
+            state.selectedThirdExternalEditor !== null
+          }
+          thirdExternalEditorLabel={thirdExternalEditorLabel}
           appMenu={state.appMenuState[0]}
           currentTutorialStep={state.currentOnboardingTutorialStep}
           onExitTutorial={this.onExitTutorial}

@@ -354,6 +354,7 @@ app.on('ready', () => {
       selectedShell: null,
       selectedExternalEditor: null,
       selectedSecondaryExternalEditor: null,
+      selectedThirdExternalEditor: null,
       askForConfirmationOnRepositoryRemoval: false,
       askForConfirmationOnForcePush: false,
     })

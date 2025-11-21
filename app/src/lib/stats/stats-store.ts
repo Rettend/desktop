@@ -147,6 +147,7 @@ const DefaultDailyMeasures: IDailyMeasures = {
   noActionTakenOnStashCount: 0,
   suggestedStepOpenInExternalEditor: 0,
   suggestedStepOpenInSecondaryExternalEditor: 0,
+  suggestedStepOpenInThirdExternalEditor: 0,
   suggestedStepOpenWorkingDirectory: 0,
   suggestedStepViewOnGitHub: 0,
   suggestedStepPublishRepository: 0,
@@ -261,8 +262,8 @@ const DefaultDailyMeasures: IDailyMeasures = {
 // A subtype of IDailyMeasures filtered to contain only its numeric properties
 export type NumericMeasures = {
   [P in keyof IDailyMeasures as IDailyMeasures[P] extends number
-    ? P
-    : never]: IDailyMeasures[P]
+  ? P
+  : never]: IDailyMeasures[P]
 }
 
 interface IOnboardingStats {

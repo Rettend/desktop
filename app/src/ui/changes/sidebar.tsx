@@ -73,6 +73,8 @@ interface IChangesSidebarProps {
   readonly externalEditorLabel?: string
   /** The name of the currently selected secondary external editor */
   readonly secondaryExternalEditorLabel?: string
+  /** The name of the currently selected third external editor */
+  readonly thirdExternalEditorLabel?: string
 
   /**
    * Callback to open a selected file using the configured external editor
@@ -86,6 +88,12 @@ interface IChangesSidebarProps {
    * @param fullPath The full path to the file on disk
    */
   readonly onOpenInSecondaryExternalEditor: (fullPath: string) => void
+  /**
+   * Callback to open a selected file using the configured third external editor
+   *
+   * @param fullPath The full path to the file on disk
+   */
+  readonly onOpenInThirdExternalEditor: (fullPath: string) => void
   readonly onChangesListScrolled: (scrollTop: number) => void
   readonly changesListScrollTop?: number
 
@@ -290,6 +298,15 @@ export class ChangesSidebar extends React.Component<IChangesSidebarProps, {}> {
   }
 
   /**
+   * Called to open a file in the third external editor
+   *
+   * @param path The path of the file relative to the root of the repository
+   */
+  private onOpenItemInThirdExternalEditor = (path: string) => {
+    this.props.onOpenInThirdExternalEditor(path)
+  }
+
+  /**
    * Toggles the selection of a given working directory file.
    * If the file is partially selected it the selection is cleared
    * in order to match the behavior of clicking on an indeterminate
@@ -467,6 +484,8 @@ export class ChangesSidebar extends React.Component<IChangesSidebarProps, {}> {
           secondaryExternalEditorLabel={this.props.secondaryExternalEditorLabel}
           onOpenItemInExternalEditor={this.onOpenItemInExternalEditor}
           onOpenItemInSecondaryExternalEditor={this.onOpenItemInSecondaryExternalEditor}
+          thirdExternalEditorLabel={this.props.thirdExternalEditorLabel}
+          onOpenItemInThirdExternalEditor={this.onOpenItemInThirdExternalEditor}
           onChangesListScrolled={this.props.onChangesListScrolled}
           changesListScrollTop={this.props.changesListScrollTop}
           stashEntry={this.props.changes.stashEntry}

@@ -87,6 +87,12 @@ interface INoChangesProps {
    */
   readonly isSecondaryExternalEditorAvailable: boolean
 
+  /**
+   * Whether or not the user has a configured third
+   * external editor.
+   */
+  readonly isThirdExternalEditorAvailable: boolean
+
   /** The user's preference of pull request suggested next action to use **/
   readonly pullRequestSuggestedNextAction?: PullRequestSuggestedNextAction
 }
@@ -399,6 +405,56 @@ export class NoChanges extends React.Component<
     )
   }
 
+  private renderOpenInThirdExternalEditor() {
+    if (!this.props.isThirdExternalEditorAvailable) {
+      return null
+    }
+
+    const itemId: MenuIDs = 'open-third-external-editor'
+    const menuItem = this.getMenuItemInfo(itemId)
+
+    if (menuItem === undefined) {
+      log.error(`Could not find matching menu item for ${itemId}`)
+    }
+
+    const title = `Open the repository in your third editor`
+
+    const description = (
+      <>
+        Select your third editor in{' '}
+        <LinkButton onClick={this.openIntegrationPreferences}>
+          {__DARWIN__ ? 'Settings' : 'Options'}
+        </LinkButton>
+      </>
+    )
+
+    const discoverabilityContent = menuItem
+      ? this.renderDiscoverabilityElements(menuItem)
+      : 'Configure shortcut in menu (View -> Keyboard Shortcuts)'
+
+    return (
+      <MenuBackedSuggestedAction
+        title={title}
+        description={description}
+        discoverabilityContent={discoverabilityContent}
+        menuItemId={itemId}
+        buttonText={
+          menuItem
+            ? formatMenuItemLabel(menuItem.label)
+            : `Open in third editor`
+        }
+        disabled={menuItem ? !menuItem.enabled : false}
+        onClick={this.onOpenInThirdExternalEditorClicked}
+      />
+    )
+  }
+
+  private onOpenInThirdExternalEditorClicked = () => {
+    this.props.dispatcher.incrementMetric(
+      'suggestedStepOpenInThirdExternalEditor'
+    )
+  }
+
   private renderRemoteAction() {
     const { remote, aheadBehind, branchesState, tagsToPush } =
       this.props.repositoryState
@@ -624,9 +680,8 @@ export class NoChanges extends React.Component<
       </>
     )
 
-    const title = `Pull ${aheadBehind.behind} ${
-      aheadBehind.behind === 1 ? 'commit' : 'commits'
-    } from the ${remote.name} remote`
+    const title = `Pull ${aheadBehind.behind} ${aheadBehind.behind === 1 ? 'commit' : 'commits'
+      } from the ${remote.name} remote`
 
     const buttonText = `Pull ${remote.name}`
 
@@ -690,9 +745,8 @@ export class NoChanges extends React.Component<
       </>
     )
 
-    const title = `Push ${itemsToPushTypes.join(' and ')} to the ${
-      remote.name
-    } remote`
+    const title = `Push ${itemsToPushTypes.join(' and ')} to the ${remote.name
+      } remote`
 
     const buttonText = `Push ${remote.name}`
 
@@ -797,6 +851,7 @@ export class NoChanges extends React.Component<
         <SuggestedActionGroup>
           {this.renderOpenInExternalEditor()}
           {this.renderOpenInSecondaryExternalEditor()}
+          {this.renderOpenInThirdExternalEditor()}
           {this.renderShowInFileManager()}
           {this.renderViewOnGitHub()}
         </SuggestedActionGroup>
