@@ -496,6 +496,15 @@ const editors: WindowsExternalEditor[] = [
     displayNamePrefixes: ['Windsurf', 'Windsurf (User)'],
     publishers: ['Codeium'],
   },
+  {
+    name: 'Antigravity',
+    registryKeys: [
+      CurrentUserUninstallKey('{AA73B3E3-C6C8-45C8-B1DC-4AE56C751432}_is1'),
+    ],
+    executableShimPaths: [['Antigravity.exe']],
+    displayNamePrefixes: ['Antigravity'],
+    publishers: ['Google'],
+  },
 ]
 
 function getKeyOrEmpty(
